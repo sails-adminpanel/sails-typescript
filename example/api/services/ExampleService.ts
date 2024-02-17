@@ -10,7 +10,7 @@ let service = {
     let b = await Category.find({"where": {id: "123"}})
     let b0 = await Category.find( {id: "123"})
     let b1 = await Category.find("test")
-    let c = await Category.findOne({"id": "test"})//.populate("articles")
+    let c = await Category.findOne({"id": "test"}).populate("articles")
     
 
     try {
