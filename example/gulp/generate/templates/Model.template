@@ -1,0 +1,44 @@
+import { Attributes,  ModelTypeDetection, ORMModel } from "../../types/waterline";
+import { v4 as uuid } from "uuid";
+
+export default Example;
+interface Example extends Partial<ModelOptions> {}
+type ModelOptions = ModelTypeDetection<typeof attributes>
+let a: Attributes;
+const attributes = a = {
+  id: {
+    type: "string",
+    allowNull: false,
+  },
+  name: {
+    type: "string",
+    required: true
+  },
+} as const;
+
+
+
+const methods = {
+  beforeCreate(record: Example, cb: (err?: Error | string) => void) {
+     if (!record.id) {
+       record.id = uuid();
+     }
+
+    cb();
+  },
+
+  /** ... Any model methods here ... */
+
+};
+
+const model = {
+  primaryKey: "id",
+  attributes: attributes,
+  ...methods,
+} as const;
+
+module.exports = model;
+
+declare global {
+  const Example: ORMModel<typeof model>
+}

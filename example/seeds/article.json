@@ -1,0 +1,57 @@
+[
+  {
+    "links": [
+      {
+        "createdAt": 1702462257454,
+        "updatedAt": 1702462257454,
+        "id": "0431e833-159d-4a8d-ba11-764d5fec088b",
+        "name": "test-category-1",
+        "slug": "test-category-1",
+        "section": "news"
+      },
+      {
+        "createdAt": 1702462270898,
+        "updatedAt": 1702462270898,
+        "id": "8b3a1577-b4a5-4d6a-a8f2-3eb2172199a8",
+        "name": "Test category 2",
+        "slug": "test-category-2",
+        "section": "news"
+      }
+    ],
+    "createdAt": 1702462325215,
+    "updatedAt": 1702462325215,
+    "id": "564fc965-8c8f-46c3-b6ce-47bd53ae601d",
+    "name": "News 2",
+    "requiredOption": false,
+    "optionsArticleModel": {},
+    "price": 453,
+    "slug": "news-2",
+    "category": {
+      "createdAt": 1702462270898,
+      "updatedAt": 1702462270898,
+      "id": "8b3a1577-b4a5-4d6a-a8f2-3eb2172199a8",
+      "name": "Test category 2",
+      "slug": "test-category-2",
+      "section": "news"
+    }
+  },
+  {
+    "links": [],
+    "createdAt": 1702462291136,
+    "updatedAt": 1702462291136,
+    "id": "da1973f0-56c3-4b6a-ba8e-e7518a3eedcf",
+    "name": "News 1",
+    "requiredOption": false,
+    "optionsArticleModel": {},
+    "price": 123,
+    "slug": "news-1",
+    "category": {
+      "createdAt": 1702462257454,
+      "updatedAt": 1702462257454,
+      "id": "0431e833-159d-4a8d-ba11-764d5fec088b",
+      "name": "test-category-1",
+      "slug": "test-category-1",
+      "section": "news"
+    }
+  }
+]

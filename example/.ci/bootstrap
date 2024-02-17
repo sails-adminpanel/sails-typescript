@@ -1,0 +1,110 @@
+#!/bin/bash
+
+cd /app
+
+# move assets
+mkdir -p .tmp/public
+\cp -R assets/* .tmp/public
+
+# disable grunt in production mode
+# todo:  rewrite for jq to set grunt:false 
+sed -i "s/\"grunt\": true/\"grunt\": false/g" .sailsrc
+export PROJECT_NAME=${PROJECT_NAME:-restoapp}
+export DEPLOY_TIME=$(date '+%d_%m_%Y_%H_%M')
+if [[ "${DATASTORE}" == "postgres" ]]; then
+
+    wait_for_database() {
+        local max_attempts=10
+        local attempt=1
+        local timeout=5
+
+        echo "Waiting for the database to be available..."
+
+        while [[ $attempt -le $max_attempts ]]; do
+            if PGPASSWORD="$PG_PASSWORD" psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_DATABASE" -c "SELECT 1;" &>/dev/null; then
+                echo "Database is available."
+                return 0
+            else
+                echo "Attempt $attempt: Database not yet available. Retrying in $timeout seconds..."
+                sleep "$timeout"
+                ((attempt++))
+            fi
+        done
+
+        echo "Database did not become available within the specified number of attempts."
+        return 1
+    }
+
+  if ! command -v pg_dump &> /dev/null; then
+      echo "pg_dump command not found, installing..."
+      apk add postgresql-client
+  fi
+
+  POSTGRES_BACKUP_PATH=${POSTGRES_BACKUP_PATH:-"/backup"}
+  mkdir -p $POSTGRES_BACKUP_PATH
+
+
+  export DB_MIGRATE=safe
+  export PG_HOST=${PG_HOST:-postgres}
+  export PG_USER=${PG_USER:-postgres}
+  export PG_DATABASE=${PG_DATABASE:-postgres}
+  export PG_PASSWORD=${PG_PASSWORD:-postgres}
+
+  create_backup=true  # Flag indicating whether to create a backup
+
+  # Check if there are files created less than an hour ago in the backup folder
+    current_time=$(date +%s)
+    for file in "$POSTGRES_BACKUP_PATH"/*; do
+        if [[ -f "$file" ]]; then
+            file_mtime=$(stat -c %Y "$file")
+            time_diff=$((current_time - file_mtime))
+            if ((time_diff < 3600)); then
+                echo "Skipping backup creation. Recent backup found."
+                create_backup=false
+                break
+            fi
+        fi
+    done
+    
+    wait_for_database
+    
+    if [ "$create_backup" = true ]; then
+        PGPASSWORD=$PG_PASSWORD pg_dump -h ${PG_HOST} -Fc -U ${PG_USER} ${PG_DATABASE} > $POSTGRES_BACKUP_PATH/${PROJECT_NAME}_${DEPLOY_TIME}.dump.sql
+    fi
+
+    if [[ "$MIGRATIONS_PATH" != "FALSE" ]]; then
+        # Migrations
+        export MIGRATIONS_PATH="/app/local_modules/**/migrations:/app/node_modules/**/migrations:$MIGRATIONS_PATH"
+        destination_folder="/app/migrations"
+        IFS=':' read -ra path_array <<< "$MIGRATIONS_PATH"
+
+        for path in "${path_array[@]}"; do
+            expanded_path=$(eval echo "$path"/*.js)
+
+            for file in $expanded_path; do
+                base_file=$(basename "$file")
+                if [ -e "$file" ]; then
+                    cp -n "$file" "$destination_folder/$base_file"
+                else
+                    echo "File '$file' not found. Skipping..."
+                fi
+            done
+        done
+
+        if [[ "$AUTO_MIGRATION" == "TRUE" ]]; then
+            npm run migrate
+        fi
+    fi
+fi
+
+
+
+if [ "$1" = 'start' ]; then
+    pm2-runtime start app.js
+elif [ "$1" = 'test' ]; then
+    npx db-migrate up:all --env dev
+    npm run test
+else
+    echo 'action not selected'
+fi
+

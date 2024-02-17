@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<% if(typeof title === 'undefined') title = ""  %>
+
+<head>
+    <title>Сайт<%= (title ? " | " + title : "") %>
+    </title>
+
+    <!-- Viewport mobile tag for sensible mobile support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/styles/style.min.css">
+    <!--STYLES END-->
+    <script src="/assets/js/script.min.js" defer></script>
+</head>
+
+<body>
+  <div class="test">
+    <h1>Test</h1>
+  </div>
+    <%- body %>
+</body>
+
+</html>

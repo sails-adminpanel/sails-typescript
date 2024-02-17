@@ -1,0 +1,29 @@
+@mixin inter-light {
+	font-family: Inter;
+	font-weight: 300;
+}
+
+@mixin inter-regular {
+	font-family: Inter;
+	font-weight: 400;
+}
+
+@mixin inter-bold {
+	font-family: Inter;
+	font-weight: 700;
+}
+
+@mixin inter-medium {
+	font-family: Inter;
+	font-weight: 500;
+}
+
+@mixin tenor-sans-regular {
+	font-family: TenorSans;
+	font-weight: 400;
+}
+
+@mixin mmanrope-regular {
+	font-family: Manrope;
+	font-weight: 400;
+}

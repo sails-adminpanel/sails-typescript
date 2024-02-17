@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": false,
+    "skipDefaultLibCheck": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "commonjs",
+    "target": "ES2020",
+    "lib": [
+      "dom"
+    ],
+    "types": [
+      "bluebird-global",
+      "mocha",
+      "node",
+      "chai",
+      "sails-typescript"
+    ],
+    "sourceMap": false,
+    "declaration": false,
+    "removeComments": false,
+    /** fix problem for chai submodule tsc check */
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

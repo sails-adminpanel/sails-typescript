@@ -1,0 +1,29 @@
+variables:
+  PROJECT_NAME: sails-starter # slug with "-" for space
+  KUBE_YML: .ci/staging.yml
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker login gitlab.com -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+    - docker build --network host -t gitlab.com/$CI_PROJECT_PATH:${CI_COMMIT_BRANCH} . 
+    - docker push gitlab.com/$CI_PROJECT_PATH:${CI_COMMIT_BRANCH}
+
+deploy:
+  stage: deploy
+  except: 
+    - main
+    - master
+  script:
+    - kubectl config use-context kubernetes-admin@kubernetes
+    - sed -i "s/<PROJECT_NAME>/${PROJECT_NAME}/g" ${KUBE_YML}
+    - sed -i "s/<CI_PROJECT_PATH>/$(echo "${CI_PROJECT_PATH//\//\\/}")/g" ${KUBE_YML}
+    - sed -i "s/<VERSION>/${CI_JOB_ID}/g" ${KUBE_YML}
+    - sed -i "s/<LAST_UPDATE_TIME>/$(date +%Y-%m-%dT%H:%M:%SZ)/g" ${KUBE_YML}
+    - sed -i "s/<BRANCH>/${CI_COMMIT_BRANCH}/g" ${KUBE_YML}
+    - sed -i -E "s/-(master|main)\././g" ${KUBE_YML}
+    - kubectl apply -f ${KUBE_YML}

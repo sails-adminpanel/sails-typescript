@@ -1,0 +1,18 @@
+# /etc/systemd/system/sails-starter.service
+# systemctl enable sails-starter
+
+[Unit]
+Description=sails-starter Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/sails-starter/
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

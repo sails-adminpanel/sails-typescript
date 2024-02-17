@@ -1,0 +1,15 @@
+@import "fonts.scss";
+@import "helpers/variables.scss";
+@import "helpers/mixin.scss";
+@import "helpers/reset.scss";
+@import "helpers/func.scss";
+
+@import "part/header.scss";
+@import "part/footer.scss";
+
+.test{
+	h1{
+		color: red;
+		text-align: center;
+	}
+}

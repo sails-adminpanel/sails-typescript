@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:9.6
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+  backend:
+    image: gitlab.com/webresto/factory/backend:main
+    environment:
+      DB_MIGRATE: safe
+      NODE_ENV: development
+      DB_DRIVER: postgresql
+      NODE_ENV: development
+      SAILS_LOG_LEVEL: debug
+    volumes:
+      - ./.tmp:/app/.tmp/
+      - ./modules:/app/modules/
+    depends_on:
+      - postgres
+    ports:
+      - "32001:42777"
