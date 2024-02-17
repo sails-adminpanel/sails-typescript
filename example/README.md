@@ -4,7 +4,13 @@
 
 # Sails TypeScript starter
 a [Sails v1](https://sailsjs.com) application starter
-a [TelegramChat](https://t.me/sails_typescript_starter) community group
+
+
+
+## SailsJS Discord community
+**Community Link:** [Join SailsJS Discord Community](https://discord.gg/VDH2yT6C)
+Feel free to use this link to connect with the community and engage in discussions or ask any questions you may have.
+
 
 ## Sails Models Typescript
 

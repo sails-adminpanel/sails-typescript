@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="./example/assets/images/starter_logo.png" alt="sails-typescript-starter">
+</p>
+
 # Sails-Typescript
+
+<span class="badge-npmversion"><a href="https://npmjs.org/package/sails-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/v/sails-typescript.svg" alt="NPM version" /></a></span>
 
 This package provides TypeScript type definitions for SailsJS, allowing developers to leverage static typing when working with SailsJS applications. It aims to add comprehensive support for Sails projects through the use of generics.
 
@@ -20,25 +26,26 @@ yarn add sails-typescript
 **Community Link:** [Join SailsJS Discord Community](https://discord.gg/VDH2yT6C)
 Feel free to use this link to connect with the community and engage in discussions or ask any questions you may have.
 
+---
 
-## Why Use Sails-Typescript?
+## Why a New Sails-Typescript Module?
 
-Sails-Typescript offers the following benefits:
+Previously, there were two separate modules for adding TypeScript support to Sails, and it was unclear which one to use. At the moment, we have combined aspects from both modules to cater to our starter, ensuring compatibility and ease of use.
 
-- **Static Typing**: TypeScript definitions provide type safety and improve developer experience by catching errors at compile-time.
-- **Enhanced Development**: Sails-Typescript enables better code completion and IntelliSense support in editors and IDEs that support TypeScript.
-- **Comprehensive Support**: This library leverages generics to provide comprehensive typing support for Sails projects.
-- **Example Usage**: The repository contains examples demonstrating how to use generics and other typing features to enhance your Sails projects.
+As TypeScript and Sails continue to evolve, updates are essential to stay current with the latest features and improvements. While both TypeScript and Sails receive updates, albeit not always as rapidly as desired, the older modules were left unsupported.
+
+Recognizing the need for a maintained solution, we forked from those older modules. Without their groundwork, this new module wouldn't have been possible. We're incredibly grateful for the opportunity to leverage static typing in Sails projects. We have a deep appreciation for Sails and its community, and we're committed to providing a seamless TypeScript experience for Sails developers.
+
+--- 
 
 ## Acknowledgements
 
 We would like to express our gratitude to the following individuals for their contributions to this project:
 
-- **Ben Teichman**: For the original work on typing SailsJS. [GitHub Profile](https://github.com/effervescentia)
-- **Alexandro Libertino**: For continued maintenance and updates. [GitHub Profile](https://github.com/sails-adminpanel)
-- **Keith Kikta**: For contributions to improving the typings. [GitHub Profile](https://github.com/newbish)
-
-Sure, here's the updated section:
+- **Ben Teichman**: For the original work on typing SailsJS. [Profile](https://github.com/effervescentia)
+- **Jimmy Cann** For the original work on typing SailsJS. [Profile](https://github.com/yjimk)
+- **Alexandro Libertino**: For Waterline types. [Profile](https://github.com/arvitaly)
+- **Keith Kikta**:  For Waterline types. [Profile](https://github.com/newbish)
 
 ---
 
