@@ -37,7 +37,7 @@ Sure, here's the updated section:
 
 ## Example Usage
 
-Inside the `example` folder (link)[https://github.com/sails-adminpanel/sails-typescript/blob/master/example], you will find a comprehensive example demonstrating how to use this library in a Sails project. The example showcases the usage of generics and provides typings for all models, offering a practical guide for integrating Sails-Typescript into your projects.
+Inside the `example` folder [link here](https://github.com/sails-adminpanel/sails-typescript/blob/master/example), you will find a comprehensive example demonstrating how to use this library in a Sails project. The example showcases the usage of generics and provides typings for all models, offering a practical guide for integrating Sails-Typescript into your projects.
 
 ---
 

@@ -11,14 +11,7 @@
   "deprecated": false,
   "description": "TypeScript definitions for sails",
   "devDependencies": {
-    "blue-tape": "^0.2.0",
-    "onchange": "^2.2.0",
-    "sails": "^0.12.3",
-    "tap-spec": "^4.1.1",
-    "ts-node": "^0.7.1",
-    "tslint-config-typings": "^0.2.0",
-    "typescript": "^2.0.0",
-    "typings": "^1.0.4"
+    "typescript": "^5.0.0"
   },
   "homepage": "https://github.com/sails-adminpanel/sails-typescript",
   "license": "MIT",
@@ -31,18 +24,6 @@
     "url": "git+https://github.com/sails-adminpanel/sails-typescript.git"
   },
   "scripts": {
-    "build": "echo building... && npm run clean && typings bundle -o dist/index.d.ts",
-    "build+test": "npm run build && npm run source-test+test",
-    "clean": "echo cleaning... && rm -rf dist/",
-    "lint": "echo linting... && tslint \"**/*.ts\" -e \"source/**\" -e \"source-test/**\" -e \"dist/**\" -e \"node_modules/**\" -e \"typings/**\"",
-    "lint+build": "npm run lint && npm run build",
-    "lint+build+test": "npm run lint && npm run build+test",
-    "prepublish": "typings install",
-    "publish2": "npm -s run lint+build && echo please publish to typings/registry",
-    "source-test": "echo source-testing... &&  echo source-test is not specified",
-    "source-test+test": "npm run source-test && npm test",
-    "test": "echo testing... && npm run build && cd test && ts-node ../node_modules/blue-tape/bin/blue-tape \"**/*.ts\" | tap-spec",
-    "watch": "onchange \"**/*.ts\" -i -e \"dist/**\" -- npm -s run build+test"
   },
   "version": "1.0.0"
 }
