@@ -14,6 +14,13 @@ or
 yarn add sails-typescript
 ```
 
+
+
+## SailsJS Discord community
+**Community Link:** [Join SailsJS Discord Community](https://discord.gg/VDH2yT6C)
+Feel free to use this link to connect with the community and engage in discussions or ask any questions you may have.
+
+
 ## Why Use Sails-Typescript?
 
 Sails-Typescript offers the following benefits:
@@ -28,7 +35,7 @@ Sails-Typescript offers the following benefits:
 We would like to express our gratitude to the following individuals for their contributions to this project:
 
 - **Ben Teichman**: For the original work on typing SailsJS. [GitHub Profile](https://github.com/effervescentia)
-- **Alexandro Libertino**: For continued maintenance and updates. [GitHub Profile](https://github.com/arvitaly)
+- **Alexandro Libertino**: For continued maintenance and updates. [GitHub Profile](https://github.com/sails-adminpanel)
 - **Keith Kikta**: For contributions to improving the typings. [GitHub Profile](https://github.com/newbish)
 
 Sure, here's the updated section:
@@ -43,7 +50,19 @@ Inside the `example` folder [link here](https://github.com/sails-adminpanel/sail
 
 ## Contributing
 
-Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on [GitHub](https://github.com/arvitaly/sails-typescript).
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on [GitHub](https://github.com/sails-adminpanel/sails-typescript).
+
+The main idea behind this project is to achieve full TypeScript support for Sails. However, there are currently some challenges due to the need to use a starter and define everything globally within it. Efforts are underway to move towards a solution where only module renaming is required.
+
+Additionally, there is a need for a pipeline to generate models, services, and helpers automatically. Contributions in these areas would greatly benefit the project and the Sails community as a whole.
+
+Contributions of all kinds are welcome! Whether you're interested in improving typings, adding features, fixing bugs, or contributing to documentation, your input is valuable.
+
+If you have any suggestions, find any issues, or have ideas for improvements, please don't hesitate to open an issue or submit a pull request on [GitHub](https://github.com/sails-adminpanel/sails-typescript).
+
+Thank you for considering contributing to Sails-Typescript!
+
+--- 
 
 ## License
 

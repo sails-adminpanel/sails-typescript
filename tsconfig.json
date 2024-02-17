@@ -10,6 +10,7 @@
   },
   "exclude": [
     "source",
+    "example",
     "node_modules",
     "typings/globals",
     "typings/modules",
