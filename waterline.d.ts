@@ -8,9 +8,9 @@ declare global {
   /**
    * The empty interface is used so that it can be used in the project
    */
-  interface Models {}
+  interface Models { }
 
-  interface CustomTypes {}
+  interface CustomTypes { }
 }
 
 
@@ -218,25 +218,25 @@ export type CriteriaQuery<T> = {
 };
 
 export type WhereCriteriaQuery<T> = {
-  [P in keyof T]?: T[P] |  
-  not<T[P]> | 
+  [P in keyof T]?: T[P] |
+  not<T[P]> |
   notId<T> |
-  lessThan<T[P]> | 
-  lessThan<T[P][]> | 
-  lessThanOrEqual<T[P]> | 
-  lessThanOrEqual<T[P][]> | 
-  greaterThanOrEqual<T[P]> | 
-  greaterThanOrEqual<T[P][]> | 
-  greaterThan<T[P]> | 
-  greaterThan<T[P][]> | 
+  lessThan<T[P]> |
+  lessThan<T[P][]> |
+  lessThanOrEqual<T[P]> |
+  lessThanOrEqual<T[P][]> |
+  greaterThanOrEqual<T[P]> |
+  greaterThanOrEqual<T[P][]> |
+  greaterThan<T[P]> |
+  greaterThan<T[P][]> |
   notEqual<T[P]> |
   notEqual<T[P]>[] |
-  _in<T[P]> | 
-  nin<T[P]> | 
-  contains | 
-  startsWith | 
-  endsWith | 
-  not<T[P][]> | 
+  _in<T[P]> |
+  nin<T[P]> |
+  contains |
+  startsWith |
+  endsWith |
+  not<T[P][]> |
   or<T>
 };
 
@@ -361,8 +361,8 @@ type NonPrimitive<T> = T extends object ? T : never;
 
 type OnlyBaseModelPrimitives<T> = T extends Primitives ? T : never;
 
-type UnionToIntersection<U> = 
-(U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+type UnionToIntersection<U> =
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 type Primitives = string | number | boolean;
 
@@ -380,8 +380,8 @@ type Populated<T> = {
 
 
 
-type ArrayOrInstanceModelPopulated<T> = T extends any[]  ?  { [K in keyof T[0]]: ModelOrPrimitive<T[0][K]> }[]  :  { [K in keyof T]: ModelOrPrimitive<T[K]>}; 
-type PopulizedModel<T> = T extends object[]  ? Populated<T[0]>[] : Populated<T> 
+type ArrayOrInstanceModelPopulated<T> = T extends any[] ? { [K in keyof T[0]]: ModelOrPrimitive<T[0][K]> }[] : { [K in keyof T]: ModelOrPrimitive<T[K]> };
+type PopulizedModel<T> = T extends object[] ? Populated<T[0]>[] : Populated<T>
 
 
 
@@ -393,79 +393,82 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<T>> & {
   where(condition: any): QueryBuilder<T>;
   limit(lim: number): QueryBuilder<T>;
   skip(num: number): QueryBuilder<T>;
-  sort(criteria: CriteriaQuery<T>): QueryBuilder<T>;
+  // TODO: impl String _or_ Array of Dictionary
+  //  sort(criteria: M<T>): QueryBuilder<T>;
+  //  sort(criteria: M<T>[]): QueryBuilder<T>;
+  sort(sortClause: string): QueryBuilder<T>;
   paginate(pagination?: { page: number; limit: number }): QueryBuilder<T>;
 
   // base population
   // populate<K extends AssociationKeys<T>, M extends T[K], N = Omit<T, K> & { [P in K]: PopulizedModel<NonPrimitive<M>> }>(association: K): QueryBuilder<N>;
-  
+
   populate<
     L = T extends object[] ? T[0] : T,
 
     // почемуто все попадают в K
     K extends AssociationKeys<L>,
 
-    M extends L[K], 
+    M extends L[K],
 
     // Types for model and collectons detect
-    F = M extends object[]? M[0]: M, 
-    
+    F = M extends object[] ? M[0] : M,
+
     N = Omit<L, K> & { [P in K]: PopulizedModel<NonPrimitive<M>> }
   >(association: K, filter?: WhereCriteriaQuery<NonPrimitive<F>>): QueryBuilder<T extends object[] ? N[] : N>;
-  
+
   /**
    * @deprecated
    */
   average(attribute: keyof T): QueryBuilder<T>;
-  
+
   /**
    * Provide additional options to Waterline when executing a query instance.
    * 
    */
   meta(options: MetaOptions): QueryBuilder<T>;
-  
+
   /**
    * Capture and intercept the specified error, automatically modifying and re-throwing it, or specifying a new error to be thrown instead. (Still throws.)
   */
   intercept?(criteria: string | string[], handler: Function | string)
-  
+
   validate<A extends keyof M>(params: A, type: M[A]): Promise<void>;
-    /**
-     * Decrypt any auto-encrypted attributes in the records returned for this particular query.
-     * with:
-     * ```
-     * await User.find({fullName: 'Finn Mertens'}).decrypt();  
-     * =>  
-     * [ { id: 4, fullName: 'Finn Mertens', ssn: '555-55-5555' } ]
-     * 
-     * ```
-     * without
-     * ```
-     * await User.find({fullName: 'Finn Mertens'});
-     * =>
-     * [ { id: 4, fullName: 'Finn Mertens', ssn: 'YWVzLTI1Ni1nY20kJGRlZmF1bHQ=$F4Du3CAHtmUNk1pn$hMBezK3lwJ2BhOjZ$6as+eXnJDfBS54XVJgmPsg' } ]
-     * ```
-     * 
-     * 
-     */
-    decrypt(): QueryBuilder<T>;
+  /**
+   * Decrypt any auto-encrypted attributes in the records returned for this particular query.
+   * with:
+   * ```
+   * await User.find({fullName: 'Finn Mertens'}).decrypt();  
+   * =>  
+   * [ { id: 4, fullName: 'Finn Mertens', ssn: '555-55-5555' } ]
+   * 
+   * ```
+   * without
+   * ```
+   * await User.find({fullName: 'Finn Mertens'});
+   * =>
+   * [ { id: 4, fullName: 'Finn Mertens', ssn: 'YWVzLTI1Ni1nY20kJGRlZmF1bHQ=$F4Du3CAHtmUNk1pn$hMBezK3lwJ2BhOjZ$6as+eXnJDfBS54XVJgmPsg' } ]
+   * ```
+   * 
+   * 
+   */
+  decrypt(): QueryBuilder<T>;
 
-    /**
-     * Tolerate (swallow) the specified error, and return a new result value (or undefined) instead. (Don't throw.)
-     * @param  filter The code of the error that you want to intercept, or a dictionary of criteria for identifying the error to intercept.
-     * @param handler An optional procedural parameter, called automatically by Sails if the anticipated error is thrown. It receives the argument specified in the "Handler" usage table below. If specified, the handler should return a value that will be used as the result. If omitted, the anticipated error will be swallowed and the result of the query will be undefined.
-     */
-    tolerate(filter?: string | string[], handler?: (err: Error)=> void)
+  /**
+   * Tolerate (swallow) the specified error, and return a new result value (or undefined) instead. (Don't throw.)
+   * @param  filter The code of the error that you want to intercept, or a dictionary of criteria for identifying the error to intercept.
+   * @param handler An optional procedural parameter, called automatically by Sails if the anticipated error is thrown. It receives the argument specified in the "Handler" usage table below. If specified, the handler should return a value that will be used as the result. If omitted, the anticipated error will be swallowed and the result of the query will be undefined.
+   */
+  tolerate(filter?: string | string[], handler?: (err: Error) => void)
 
-    /**
-     * This is an alternative to .exec().
-     */
-    toPromise(): QueryBuilder<T>;
-    
-    /**
-     * Specify an existing database connection to use for this query.
-     */
-    usingConnection(connection: any): QueryBuilder<T>;
+  /**
+   * This is an alternative to .exec().
+   */
+  toPromise(): QueryBuilder<T>;
+
+  /**
+   * Specify an existing database connection to use for this query.
+   */
+  usingConnection(connection: any): QueryBuilder<T>;
 };
 
 type RecordHandler<M> = (record: M) => Promise<M>;
@@ -488,10 +491,10 @@ export type Model<M> = Omit<M, "primaryKey" | "attributes"> & ORMModel<Pick<M, "
 export interface ORMModel<
   M,
   Attr = Partial<ModelTypeDetection<M['attributes']>> & ModelTimestamps,
-  PK = Attr[M['primaryKey'] extends never ? 'id' : M['primaryKey']], 
+  PK = Attr[M['primaryKey'] extends never ? 'id' : M['primaryKey']],
   TypeOfPK = Attr extends { [K in PK]: infer PKType } ? PKType : never,
   C = RequiredKeys<M['attributes']>
-  > {
+> {
 
   /**
    * Create a new record in the database. 
@@ -518,7 +521,7 @@ export interface ORMModel<
   find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[]>;
   find?(criteria?: CriteriaQuery<PopulizedModel<Attr>>): QueryBuilder<Attr[]>;
   find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[]>;
-  
+
   /**
    * Find a single record that matches the specified criteria.
    */
@@ -676,12 +679,12 @@ export type ManyToManyAttribute = {
 */
 interface BaseAttribute {
   type: AttributeType;
-  
+
   /**
    * @deprecated in sails v1
   */
   primaryKey?: boolean | undefined;
- 
+
   /**
    * Set unique ORM checks
   */
@@ -697,25 +700,25 @@ interface BaseAttribute {
   autoUpdatedAt?: boolean | undefined;
   updatedAt?: boolean | undefined;
   createdAt?: boolean | undefined;
-  
+
   /**
    * Sets up the attribute as an auto-increment key. When a new record is added to the model, if a value for this attribute is not specified, it will be generated by incrementing the most recent record's value by one. Note: attributes that specify autoIncrement should always be of type: 'number'. Also bear in mind that the level of support varies across different datastores. 
   */
   autoIncrement?: boolean | undefined;
- 
-  
- /**
-  * Setting encrypt allows you to decide whether this attribute should be automatically encrypted. If set to true, when a record is retrieved, it will still contain the encrypted value for this attribute unless .decrypt() is used.
-   */
+
+
+  /**
+   * Setting encrypt allows you to decide whether this attribute should be automatically encrypted. If set to true, when a record is retrieved, it will still contain the encrypted value for this attribute unless .decrypt() is used.
+    */
   encrypt?: boolean | undefined;
-  
+
   // TODO: add detect validation compatible https://sailsjs.com/documentation/concepts/models-and-orm/validations
 
 }
 
 
 type Rule =
-  | { 
+  | {
     /**
      * A value such that when it is provided as the first argument to the custom function, the function returns true.
      * 
@@ -723,31 +726,31 @@ type Rule =
      */
     custom: (value: any) => boolean
   }
-  | { 
+  | {
     /**
      * A value that, when parsed as a date, refers to a moment after the configured JavaScript Date instance.
      * 
      * Applicable Attribute Type(s): String, Number
      */
-    isAfter: Date 
+    isAfter: Date
   }
-  | { 
+  | {
     /**
      * A value that, when parsed as a date, refers to a moment before the configured JavaScript Date instance.
      * 
      * Applicable Attribute Type(s): String, Number
      */
-    isBefore: Date 
+    isBefore: Date
   }
-  | { 
+  | {
     /**
      * A value that is true or false.
      * 
      * Applicable Attribute Type(s): JSON, Ref
      */
-    isBoolean: boolean 
+    isBoolean: boolean
   }
-  | { 
+  | {
     /**
      * A value that is a credit card number.
      * 
@@ -755,150 +758,150 @@ type Rule =
      * 
      * Notes: Do not store credit card numbers in your database unless your app is PCI compliant! If you want to allow users to store credit card information, a safe alternative is to use a payment API like Stripe.
      */
-    isCreditCard: boolean 
+    isCreditCard: boolean
   }
-  | { 
+  | {
     /**
      * A value that looks like an email address.
      * 
      * Applicable Attribute Type(s): String
      */
-    isEmail: boolean 
+    isEmail: boolean
   }
-  | { 
+  | {
     /**
      * A string that is a hexadecimal color.
      * 
      * Applicable Attribute Type(s): String
      */
-    isHexColor: boolean 
+    isHexColor: boolean
   }
-  | { 
+  | {
     /**
      * A value that is in the specified array of allowed strings.
      * 
      * Applicable Attribute Type(s): String
      */
-    isIn: string[] 
+    isIn: string[]
   }
-  | { 
+  | {
     /**
      * A number that is an integer (a whole number).
      * 
      * Applicable Attribute Type(s): Number
      */
-    isInteger: boolean 
+    isInteger: boolean
   }
-  | { 
+  | {
     /**
      * A value that is a valid IP address (v4 or v6).
      * 
      * Applicable Attribute Type(s): String
      */
-    isIP: boolean 
+    isIP: boolean
   }
-  | { 
+  | {
     /**
      * A value that is not an empty string.
      * 
      * Applicable Attribute Type(s): JSON, Ref
      */
-    isNotEmptyString: boolean 
+    isNotEmptyString: boolean
   }
-  | { 
+  | {
     /**
      * A value that is not in the configured array.
      * 
      * Applicable Attribute Type(s): String
      */
-    isNotIn: string[] 
+    isNotIn: string[]
   }
-  | { 
+  | {
     /**
      * A value that is a JavaScript number.
      * 
      * Applicable Attribute Type(s): JSON, Ref
      */
-    isNumber: boolean 
+    isNumber: boolean
   }
-  | { 
+  | {
     /**
      * A value that is a string.
      * 
      * Applicable Attribute Type(s): JSON, Ref
      */
-    isString: boolean 
+    isString: boolean
   }
-  | { 
+  | {
     /**
      * A value that looks like a URL.
      * 
      * Applicable Attribute Type(s): String
      */
-    isURL: boolean 
+    isURL: boolean
   }
-  | { 
+  | {
     /**
      * A value that looks like a UUID (v3, v4, or v5).
      * 
      * Applicable Attribute Type(s): String
      */
-    isUUID: boolean 
+    isUUID: boolean
   }
-  | { 
+  | {
     /**
      * A number that is less than or equal to the configured number.
      * 
      * Applicable Attribute Type(s): Number
      */
-    max: number 
+    max: number
   }
-  | { 
+  | {
     /**
      * A number that is greater than or equal to the configured number.
      * 
      * Applicable Attribute Type(s): Number
      */
-    min: number 
+    min: number
   }
-  | { 
+  | {
     /**
      * A string that has no more than the configured number of characters.
      * 
      * Applicable Attribute Type(s): String
      */
-    maxLength: number 
+    maxLength: number
   }
-  | { 
+  | {
     /**
      * A string that has at least the configured number of characters.
      * 
      * Applicable Attribute Type(s): String
      */
-    minLength: number 
+    minLength: number
   }
-  | { 
+  | {
     /**
      * A string that matches the configured regular expression.
      * 
      * Applicable Attribute Type(s): String
      */
-    regex: RegExp 
+    regex: RegExp
   };
 
 
 export type CustomAttribute<T> = T
 
-type AttributeType = 'string' | 'number' | 'boolean' | 'json'  | 'ref' ;
+type AttributeType = 'string' | 'number' | 'boolean' | 'json' | 'ref';
 
 type SimpleAttribute = AttributeType;
 
-export type Attribute = SimpleAttribute 
-| BaseAttribute 
-| OneToOneAttribute
-| OneToManyAttribute
-| ManyToManyAttribute
-| Rule
+export type Attribute = SimpleAttribute
+  | BaseAttribute
+  | OneToOneAttribute
+  | OneToManyAttribute
+  | ManyToManyAttribute
+  | Rule
 
 type ModelRelationType<T> = T extends keyof Models ? Models[T] | string : T;
 type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string : T;
@@ -910,7 +913,7 @@ export type Attributes = {
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
-export type ModelTypeRaw<T>= {
+export type ModelTypeRaw<T> = {
   [K in keyof T]: AttributeTypeDetection<T[K], K>;
 };
 
@@ -918,26 +921,26 @@ export type ModelTypeDetection<T> = ModelTypeRaw<Writeable<T>> & ModelTimestamps
 
 
 type AttributeTypeDetection<T, K> =
-    T extends BaseAttribute ? (T['type'] extends 'string' ?  
-        // check isIn string 
-        T['isIn'] extends readonly string[] ? StringArrayToUnion<T['isIn']> : string
+  T extends BaseAttribute ? (T['type'] extends 'string' ?
+    // check isIn string 
+    T['isIn'] extends readonly string[] ? StringArrayToUnion<T['isIn']> : string
     : T['type'] extends 'number' ? number
     : T['type'] extends 'boolean' ? boolean
     : T['type'] extends 'json' ? CustomType<K>
     : never)
 
-    // Model relation
-    : T extends { model: string } ? T['model'] extends `${keyof Models}` ? ModelRelationType<T['model']> : never 
-    
-    // Collection relation
-    : T extends { collection: string } ? T['collection'] extends `${keyof Models}` ? CollectionRelationType<T['collection']> : never :
-    
-    T extends AttributeType ? 
-      (T extends 'string' ? string
-          : T extends 'number' ? number
-          : T extends 'boolean' ? boolean
-          : T extends 'json' ? DefaultJsonType | DefaultJsonType[]
-          : never) : never
+  // Model relation
+  : T extends { model: string } ? T['model'] extends `${keyof Models}` ? ModelRelationType<T['model']> : never
+
+  // Collection relation
+  : T extends { collection: string } ? T['collection'] extends `${keyof Models}` ? CollectionRelationType<T['collection']> : never :
+
+  T extends AttributeType ?
+  (T extends 'string' ? string
+    : T extends 'number' ? number
+    : T extends 'boolean' ? boolean
+    : T extends 'json' ? DefaultJsonType | DefaultJsonType[]
+    : never) : never
 
 
 // Required keys
@@ -953,7 +956,7 @@ type NumericKeys<T> = {
 }[keyof T];
 
 type DefaultJsonType = {
-  [key: string]: string | string[] | number | number[] | boolean  | null 
+  [key: string]: string | string[] | number | number[] | boolean | null
 }
 
 export type ModelTimestamps = {

@@ -1,4 +1,4 @@
-import { Attributes, ModelTypeDetection, Model } from "../../../waterline";
+import { Attributes, ModelTypeDetection, Model } from "sails-typescript";
 import { v4 as uuid } from "uuid";
 import slugify from "slugify"
 /**
