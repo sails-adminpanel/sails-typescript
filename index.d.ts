@@ -4,6 +4,7 @@ import {
   Request as ExprRequest,
   Response as ExprResponse
 } from 'express';
+
 import { EventEmitter } from 'events';
 import { Readable, Writable } from 'stream';
 // import { Collection } from 'mongodb';
@@ -1094,3 +1095,5 @@ declare namespace sails {
 }
 
 export default sails;
+export * from "./waterline"
+export * from "./waterlineInstance"

@@ -1,4 +1,4 @@
-import { Attributes,  ModelTypeDetection, Model } from "../../types/waterline";
+import { Attributes,  ModelTypeDetection, Model } from "../../../waterline";
 import { v4 as uuid } from "uuid";
 import slugify from "slugify"
 
