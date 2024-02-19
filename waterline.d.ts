@@ -3,6 +3,17 @@ import BluebirdPromise = require('bluebird');
 
 export type Callback<T> = (err: Error | null, result: T) => void;
 
+
+declare global {
+  /**
+   * The empty interface is used so that it can be used in the project
+   */
+  interface Models {}
+
+  interface CustomTypes {}
+}
+
+
 export type DataStore = {
   manager: any,
   config: any,

@@ -1,29 +1,32 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es6",
+    "strictNullChecks": false,
+    "skipDefaultLibCheck": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": true,
     "noImplicitAny": true,
-    "declaration": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "out"
+    "target": "ES2020",
+    "lib": [
+      "dom"
+    ],
+    "sourceMap": false,
+    "declaration": false,
+    "removeComments": false,
+    /** fix problem for chai submodule tsc check */
+    "skipLibCheck": true
   },
   "exclude": [
     "source",
     "example",
     "node_modules",
-    "typings/globals",
     "typings/modules",
     "dist"
-  ],
-  "baseUrl": "types",
-  "typeRoots": ["types"],
-  "atom": {
-    "rewriteTsconfig": true,
-    "formatOnSave": true
-  },
-  "formatCodeOptions": {
-    "indentSize": 2,
-    "tabSize": 2
-  }
+  ]
 }
