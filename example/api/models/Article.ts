@@ -7,13 +7,6 @@ export interface OptionsArticleModel {
   second: string
 }
 
-/**
- * Define sails prject model 
- * 
- * When you define model by this template, you should also add 
- * this model in `ProjectModel` type `types/projectModels.d.ts`
- *  */ 
-
 // Define Attributes
 export default Article;
 interface Article extends Partial<ModelOptions> {}
@@ -30,19 +23,9 @@ const attributes = a = {
     required: true,
   },
 
-  /**
-   * For add custom type (ex: OptionsArticleModel) for json type Field you should import
-   * you type in `types/customTypes.d.ts` file, and assign your type
-   * for key with same name as your json type field
-   * 
-   * ⚠️ For different models with the same `'json'` property, there must be one type. 
-   * In the current version, I haven't found a more elegant way to solve this.
-   *  
-   * If you have an idea please contact us, or make a github issue / PR in this repo
-   */
   optionsArticleModel: {
     type: "json",
-  } as const,
+  },
   price: {
     type: "number",
     required: true
@@ -67,6 +50,7 @@ const methods = {
     if (!record.id) {
       record.id = uuid();
     }
+    let a = record.optionsArticleModel
     if(!record.slug) {
       record.slug = slugify(`${record.name}`, { remove: /[*+~.()'"!:@\\\/]/g, lower: true, strict: true, locale: 'en'})
     }
@@ -91,6 +75,9 @@ declare global {
   const Article: Model<typeof model>;
   interface Models {
     Article: Article;
+  }
+  interface CustomTypes {
+    optionsArticleModel: OptionsArticleModel
   }
 }
 

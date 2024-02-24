@@ -4,7 +4,6 @@ import * as sailsNamespaceLib  from "sails-typescript";
 type SailsConfig = typeof sailsNamespaceLib.default.config & ISailsConfig;
 
 
-import { ProjectCustomTypes } from "./customTypes";
 declare global {
 
   interface ISailsConfig {
@@ -18,7 +17,6 @@ declare global {
   // Remove types from T that are not assignable to U
   type Filter<T, U> = T extends U ? T : never;
   
-  type CustomTypes = ProjectCustomTypes
   interface Sails extends _sails.Sails {
     models: any;
     config: SailsConfig;
