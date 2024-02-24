@@ -7,9 +7,8 @@ export interface OptionsArticleModel {
   second: string
 }
 
-// Define Attributes
-export default Article;
-interface Article extends Partial<ModelOptions> {}
+export type ArticleInstance = Article;
+interface Article extends Partial<ModelOptions> { }
 type ModelOptions = ModelTypeDetection<typeof attributes>
 let a: Attributes;
 const attributes = a = {
@@ -30,7 +29,7 @@ const attributes = a = {
     type: "number",
     required: true
   },
-  slug:{
+  slug: {
     type: "string",
     unique: true
   },
@@ -50,9 +49,9 @@ const methods = {
     if (!record.id) {
       record.id = uuid();
     }
-    let a = record.optionsArticleModel
-    if(!record.slug) {
-      record.slug = slugify(`${record.name}`, { remove: /[*+~.()'"!:@\\\/]/g, lower: true, strict: true, locale: 'en'})
+    
+    if (!record.slug) {
+      record.slug = slugify(`${record.name}`, { remove: /[*+~.()'"!:@\\\/]/g, lower: true, strict: true, locale: 'en' })
     }
     cb();
   },
@@ -76,7 +75,16 @@ declare global {
   interface Models {
     Article: Article;
   }
-  interface CustomTypes {
+
+  /**
+   * To assign the optionsArticleModel field to the desired type, you must complete the global interface
+   * ⚠️ For different models with the same `'json'` property, there must be one type. 
+   * In the current version, I haven't found a more elegant way to solve this.
+   *  
+   * If you have an idea please contact us, or make a github issue / PR in this repo
+   */
+
+  interface AppCustomJsonTypes {
     optionsArticleModel: OptionsArticleModel
   }
 }

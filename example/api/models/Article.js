@@ -15,7 +15,7 @@ const attributes = a = {
     },
     /**
      * For add custom type (ex: OptionsArticleModel) for json type Field you should import
-     * you type in `types/customTypes.d.ts` file, and assign your type
+     * you type in `types/ModelJsonTypes.d.ts` file, and assign your type
      * for key with same name as your json type field
      *
      * ⚠️ For different models with the same `'json'` property, there must be one type.
