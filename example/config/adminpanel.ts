@@ -1,5 +1,4 @@
 import { ModelConfig, AdminpanelConfig } from "sails-adminpanel/interfaces/adminpanelConfig"
-import { FieldsTypes } from 'sails-adminpanel/interfaces/fieldsTypes'
 let models: { [key:string]: ModelConfig } = {
   category:{
     title: 'Category',
@@ -20,7 +19,7 @@ let models: { [key:string]: ModelConfig } = {
       id: false,
       name: 'Name',
       optionsArticleModel: {
-        type: FieldsTypes.json,
+        type: "json",
         title: 'JSON editor'
       },
       createdAt: false,

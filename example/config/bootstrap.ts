@@ -9,9 +9,11 @@
  * https://sailsjs.com/config/bootstrap
  */
 
+//@ts-ignore
 const fs = require('fs');
 const path = require('path');
-const relations = []
+
+const relations: any = []
 
 module.exports.bootstrap = async function () {
 
@@ -25,7 +27,7 @@ module.exports.bootstrap = async function () {
     try {
       let seedsDir = process.env.SEED_PATH ? process.env.SEED_PATH : __dirname + '/../seeds/';
       // load JSON data
-      let seeds = fs.readdirSync(seedsDir).filter((file) => {
+      let seeds = fs.readdirSync(seedsDir).filter((file: any) => {
         return path.extname(file).toLowerCase() === '.json';
       });
 
@@ -40,7 +42,7 @@ module.exports.bootstrap = async function () {
           if (sails.models[model]) {
             await sails.models[model].destroy({}).fetch();
             if (Array.isArray(jsonSeedData)) {
-              for await (seedItem of jsonSeedData) {
+              for await (const seedItem of jsonSeedData) {
                 await create(model, seedItem)
               }
               sails.log.debug(`🌱 Bootstrap seed ${model}: > count: ${jsonSeedData.length}`);
@@ -60,7 +62,7 @@ module.exports.bootstrap = async function () {
       /**
        * Start load JS seed files
        */ 
-      seeds = fs.readdirSync(seedsDir).filter((file) => {
+      seeds = fs.readdirSync(seedsDir).filter((file: any) => {
         return path.extname(file).toLowerCase() === '.js';
       });
 
@@ -70,12 +72,12 @@ module.exports.bootstrap = async function () {
           .readFileSync(seedsDir + '.queue')
           .toString()
           .split('\n')
-          .filter(v => v);
+          .filter((v: any) => v);
         let _seeds = [...seeds];
         seeds = [];
 
         // Build head loadlist of js seeds files
-        queuelist.forEach((qItem) => {
+        queuelist.forEach((qItem: any) => {
           _seeds.forEach((sItem) => {
             if (sItem.includes(qItem)) {
               seeds.push(sItem);
@@ -115,7 +117,7 @@ module.exports.bootstrap = async function () {
           sails.log.error(`Relation value not defined!!! ${JSON.stringify(relation)}`)
         }
         // find relation target
-        const criteria = {};
+        const criteria: any = {};
         if(relation.value.slug){
           criteria.slug = relation.value.slug;
         } else {
@@ -129,7 +131,7 @@ module.exports.bootstrap = async function () {
             if(relation.type === "collection"){
               await sails.models[relation.model].addToCollection(relation.id, relation.key).members(found.id);
             } else {
-              let update = {};
+              let update: any = {};
               update[relation.key] = found.id
               await sails.models[relation.model].update({id: relation.id}, update);
             }
@@ -160,28 +162,37 @@ module.exports.bootstrap = async function () {
 } as Sails['config']['bootstrap'];
 
 
-function cleanSeedItem(model, seedItem) {
+function cleanSeedItem(model: string | number, seedItem: { [s: string]: unknown; } | ArrayLike<unknown>) {
   const attributes = sails.models[model].attributes
   for (let attribute in attributes) {
+    // @ts-ignore
     if (Object.keys(attributes[attribute]).includes('collection') && seedItem[attribute]) {
+      // @ts-ignore
       delete seedItem[attribute]
     }
-
+    // @ts-ignore
     if (Object.keys(attributes[attribute]).includes('model') && seedItem[attribute]) {
+      // @ts-ignore
       delete seedItem[attribute]
     }
   }
-
+  
+  // @ts-ignore
   if(seedItem.createdAt) {delete(seedItem.createdAt);}
+  // @ts-ignore
   if(seedItem.updatedAt) {delete(seedItem.updatedAt);}
+  // @ts-ignore
   if(typeof seedItem.id === 'number') delete(seedItem.id);
 
   for (const [key, value] of Object.entries(seedItem)) {
     if (value === null || value === undefined)  {
+      // @ts-ignore
       delete(seedItem[key]);
     } else {
       try {
+        // @ts-ignore
         let jsonValue = JSON.parse(value);
+        // @ts-ignore
         seedItem[key] = jsonValue;
       } catch (e) {
       }
@@ -190,7 +201,7 @@ function cleanSeedItem(model, seedItem) {
 }
 
 
-async function create(model, seedItem) {
+async function create(model: string | number, seedItem: { [x: string]: any; }) {
   let cleanedSeedItem = {...seedItem};
   cleanSeedItem(model, cleanedSeedItem);
   let createdInstance = await sails.models[model].create(cleanedSeedItem).fetch();

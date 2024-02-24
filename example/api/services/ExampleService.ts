@@ -10,6 +10,7 @@ let service = {
     let b = await Category.find({"where": {id: "123"}})
     let b0 = await Category.find( {id: "123"})
     let b1 = await Category.find("test")
+    // !TODO: over load work not correctly
     let w1 = await Article.findOne({id: "123"});
     let c = await Category.findOne({"id": "test"}).populate("articles")
     
@@ -18,6 +19,8 @@ let service = {
     // w This is custom type (AppCustomJsonTypes)
     w.optionsArticleModel
     
+
+    // !TODO: links should  accept only number array
     await Article.create({price: 123, requiredOption: true, links: [123,345]}).fetch() 
 
   //  await Article.update("123", { category: [123,345]}).fetch() 

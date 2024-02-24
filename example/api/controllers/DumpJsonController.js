@@ -1,6 +1,7 @@
 "use strict";
 const child_process = require('child_process');
 const folderpath = './.tmp';
+//@ts-ignore
 const fs = require("fs");
 module.exports = {
     index: async function (req, res) {

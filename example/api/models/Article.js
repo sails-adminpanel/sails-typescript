@@ -13,16 +13,6 @@ const attributes = a = {
         type: "boolean",
         required: true,
     },
-    /**
-     * For add custom type (ex: OptionsArticleModel) for json type Field you should import
-     * you type in `types/ModelJsonTypes.d.ts` file, and assign your type
-     * for key with same name as your json type field
-     *
-     * ⚠️ For different models with the same `'json'` property, there must be one type.
-     * In the current version, I haven't found a more elegant way to solve this.
-     *
-     * If you have an idea please contact us, or make a github issue / PR in this repo
-     */
     optionsArticleModel: {
         type: "json",
     },

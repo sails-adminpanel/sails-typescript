@@ -9,6 +9,7 @@
  * For more information on seeding your app with fake data, check out:
  * https://sailsjs.com/config/bootstrap
  */
+//@ts-ignore
 const fs = require('fs');
 const path = require('path');
 const relations = [];
@@ -34,7 +35,7 @@ module.exports.bootstrap = async function () {
                     if (sails.models[model]) {
                         await sails.models[model].destroy({}).fetch();
                         if (Array.isArray(jsonSeedData)) {
-                            for await (seedItem of jsonSeedData) {
+                            for await (const seedItem of jsonSeedData) {
                                 await create(model, seedItem);
                             }
                             sails.log.debug(`🌱 Bootstrap seed ${model}: > count: ${jsonSeedData.length}`);
@@ -65,7 +66,7 @@ module.exports.bootstrap = async function () {
                     .readFileSync(seedsDir + '.queue')
                     .toString()
                     .split('\n')
-                    .filter(v => v);
+                    .filter((v) => v);
                 let _seeds = [...seeds];
                 seeds = [];
                 // Build head loadlist of js seeds files
@@ -151,28 +152,38 @@ module.exports.bootstrap = async function () {
 function cleanSeedItem(model, seedItem) {
     const attributes = sails.models[model].attributes;
     for (let attribute in attributes) {
+        // @ts-ignore
         if (Object.keys(attributes[attribute]).includes('collection') && seedItem[attribute]) {
+            // @ts-ignore
             delete seedItem[attribute];
         }
+        // @ts-ignore
         if (Object.keys(attributes[attribute]).includes('model') && seedItem[attribute]) {
+            // @ts-ignore
             delete seedItem[attribute];
         }
     }
+    // @ts-ignore
     if (seedItem.createdAt) {
         delete (seedItem.createdAt);
     }
+    // @ts-ignore
     if (seedItem.updatedAt) {
         delete (seedItem.updatedAt);
     }
+    // @ts-ignore
     if (typeof seedItem.id === 'number')
         delete (seedItem.id);
     for (const [key, value] of Object.entries(seedItem)) {
         if (value === null || value === undefined) {
+            // @ts-ignore
             delete (seedItem[key]);
         }
         else {
             try {
+                // @ts-ignore
                 let jsonValue = JSON.parse(value);
+                // @ts-ignore
                 seedItem[key] = jsonValue;
             }
             catch (e) {

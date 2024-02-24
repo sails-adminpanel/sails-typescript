@@ -2,11 +2,12 @@
 module.exports.orm = {
     _hookTimeout: 160000
 };
+// @ts-ignore
 const fs = require('fs');
 var migrate = 'drop';
 if (process.env.NODE_ENV !== 'production') {
     if (process.env.DB_MIGRATE === 'alter') {
-        process.env.DB_MIGRATE === 'safe';
+        process.env.DB_MIGRATE = 'safe';
         sails.log.error('Migration type [alter] not allowed. Setting [safe]');
     }
     if (process.env.DB_MIGRATE === 'safe' || process.env.DB_MIGRATE === 'drop') {

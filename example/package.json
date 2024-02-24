@@ -13,7 +13,7 @@
     "event-stream": "^4.0.1",
     "patch-package": "^8.0.0",
     "sails": "^1.5.7",
-    "sails-adminpanel": "^2.5.0",
+    "sails-adminpanel": "^2.6.0",
     "sails-hook-orm": "^4.0.2",
     "sails-postgresql": "^5.0.1",
     "slugify": "^1.6.6",

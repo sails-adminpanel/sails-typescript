@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fieldsTypes_1 = require("sails-adminpanel/interfaces/fieldsTypes");
 let models = {
     category: {
         title: 'Category',
@@ -21,7 +20,7 @@ let models = {
             id: false,
             name: 'Name',
             optionsArticleModel: {
-                type: fieldsTypes_1.FieldsTypes.json,
+                type: "json",
                 title: 'JSON editor'
             },
             createdAt: false,
