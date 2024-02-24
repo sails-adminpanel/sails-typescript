@@ -20,7 +20,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "sails-typescript": "^1.0.4",
+    "sails-typescript": "file:..",
     "@types/bluebird": "^3.5.38",
     "@types/bluebird-global": "^3.5.13",
     "@types/body-parser": "^1.19.2",

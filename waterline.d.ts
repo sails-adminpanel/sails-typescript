@@ -10,7 +10,7 @@ declare global {
    */
   interface Models { }
 
-  interface CustomTypes { }
+  interface AppCustomJsonTypes { }
 }
 
 
@@ -493,6 +493,9 @@ export interface ORMModel<
   Attr = Partial<ModelTypeDetection<M['attributes']>> & ModelTimestamps,
   PK = Attr[M['primaryKey'] extends never ? 'id' : M['primaryKey']],
   TypeOfPK = Attr extends { [K in PK]: infer PKType } ? PKType : never,
+  /**
+   * List of required keys
+   */
   C = RequiredKeys<M['attributes']>
 > {
 
@@ -904,8 +907,11 @@ export type Attribute = SimpleAttribute
   | Rule
 
 type ModelRelationType<T> = T extends keyof Models ? Models[T] | string : T;
-type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string : T;
-type CustomType<K> = K extends keyof CustomTypes ? CustomTypes[K] : DefaultJsonType[] | DefaultJsonType;
+
+//type CollectionRelationType<T> = T extends keyof Models ? `${Models[T]}['primaryKey'] | string[] : T;
+ type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string[] | number[] : T;
+
+type AssignCustomType<K> = K extends keyof AppCustomJsonTypes ? AppCustomJsonTypes[K] : DefaultJsonType[] | DefaultJsonType;
 
 export type Attributes = {
   [key: string]: Attribute;
@@ -913,20 +919,28 @@ export type Attributes = {
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
-export type ModelTypeRaw<T> = {
-  [K in keyof T]: AttributeTypeDetection<T[K], K>;
+export type ModelTypeRaw<ConstAttrs> = {
+  [K in keyof ConstAttrs]: AttributeTypeDetection<ConstAttrs[K], K>;
 };
 
-export type ModelTypeDetection<T> = ModelTypeRaw<Writeable<T>> & ModelTimestamps
+/**
+ * Recognizes model fields by types from constants
+ * ConstAttrs - The constant that comes in attibuts of Model
+ */
+export type ModelTypeDetection<ConstAttrs> = ModelTypeRaw<Writeable<ConstAttrs>> & ModelTimestamps
 
-
-type AttributeTypeDetection<T, K> =
+/**
+ * Attribute type detection
+ * F - Key of fields
+ * T - Value
+ */
+type AttributeTypeDetection<T, F> =
   T extends BaseAttribute ? (T['type'] extends 'string' ?
     // check isIn string 
     T['isIn'] extends readonly string[] ? StringArrayToUnion<T['isIn']> : string
     : T['type'] extends 'number' ? number
     : T['type'] extends 'boolean' ? boolean
-    : T['type'] extends 'json' ? CustomType<K>
+    : T['type'] extends 'json' ? AssignCustomType<F>
     : never)
 
   // Model relation
