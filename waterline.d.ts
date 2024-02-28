@@ -357,7 +357,13 @@ type AssociationKeys<T> = {
   [K in keyof T]: IsInstanceOfModels<T[K], Models> extends never ? never : K;
 }[keyof T];
 
-type NonPrimitive<T> = T extends object ? T : never;
+type NonPrimitive<T> = T extends object
+  ? Exclude<T, string | number | boolean | symbol | null | undefined>
+  : never;
+
+type NonPrimitiveArray<T> = T extends (infer U)[]
+  ? U extends never ? never : NonPrimitive<U>[]
+  : never;
 
 type OnlyBaseModelPrimitives<T> = T extends Primitives ? T : never;
 
@@ -370,20 +376,16 @@ type DistributivePrimitive<T> = T extends Primitives ? T : never;
 
 type DistributiveModel<T> = T extends Array<T> ? T[0] extends Models[keyof Models] ? T : never : T;
 
+
+
+
 type ModelOrPrimitive<T> = [DistributivePrimitive<T>] extends [never]
   ? DistributiveModel<T>
   : DistributivePrimitive<T>;
 
-type Populated<T> = {
-  [K in keyof T]: ModelOrPrimitive<T[K]>;
-};
-
-
-
 type ArrayOrInstanceModelPopulated<T> = T extends any[] ? { [K in keyof T[0]]: ModelOrPrimitive<T[0][K]> }[] : { [K in keyof T]: ModelOrPrimitive<T[K]> };
-type PopulizedModel<T> = T extends object[] ? Populated<T[0]>[] : Populated<T>
 
-
+type Filtered<T> = T extends never[] ? never : T;
 
 
 /**
@@ -408,13 +410,15 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<T>> & {
     // почемуто все попадают в K
     K extends AssociationKeys<L>,
 
-    M extends L[K],
+    FieldType extends L[K],
 
     // Types for model and collectons detect
-    F = M extends object[] ? M[0] : M,
+    F = FieldType extends object[] ? M[0] : M,
 
-    N = Omit<L, K> & { [P in K]: PopulizedModel<NonPrimitive<M>> }
-  >(association: K, filter?: WhereCriteriaQuery<NonPrimitive<F>>): QueryBuilder<T extends object[] ? N[] : N>;
+    PopulizedField = Filtered<NonPrimitiveArray<FieldType>>,
+
+    N = Omit<L, K> & { [P in K]: PopulizedField}
+  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? N[] : N>;
 
   /**
    * @deprecated
@@ -522,15 +526,15 @@ export interface ORMModel<
    * Find records that match the specified criteria.
    */
   find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[]>;
-  find?(criteria?: CriteriaQuery<PopulizedModel<Attr>>): QueryBuilder<Attr[]>;
+  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[]>;
   find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[]>;
 
   /**
    * Find a single record that matches the specified criteria.
    */
   findOne?(primaryKey?: TypeOfPK): QueryBuilder<Attr>;
-  findOne?(criteria?: CriteriaQuery<PopulizedModel<Attr>>): QueryBuilder<Attr>;
-  findOne?(where?: WhereCriteriaQuery<PopulizedModel<Attr>>): QueryBuilder<Attr>;
+  findOne?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr>;
+  findOne?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr>;
 
   /**
    * Finds a record matching the provided criteria, or creates one if no record was found.

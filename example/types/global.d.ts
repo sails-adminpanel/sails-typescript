@@ -17,7 +17,7 @@ declare global {
   // Remove types from T that are not assignable to U
   type Filter<T, U> = T extends U ? T : never;
   
-  interface Sails extends _sails.Sails {
+  interface Sails extends sailsNamespaceLib.default.Sails {
     models: any;
     config: SailsConfig;
     log: any;
