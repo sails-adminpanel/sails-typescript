@@ -93,7 +93,7 @@ declare namespace sails {
 
   type ApplicationLifecycle = 'ready' | 'lifted' | 'lowered';
 
-  interface Request /*extends ExprRequest*/ {
+  interface Request extends ExprRequest {
     /**
      * @http
      * @websocket
@@ -258,7 +258,7 @@ declare namespace sails {
     wantsJSON: boolean;
   }
 
-  interface Response /*extends ExprResponse*/ {
+  interface Response extends ExprResponse {
     /**
      * @http
      * @websocket
