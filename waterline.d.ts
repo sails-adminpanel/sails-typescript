@@ -1,6 +1,8 @@
 import { LifecycleCallbacks, AttributeValidations } from "waterline";
 import BluebirdPromise = require('bluebird');
 import WhereCriteriaQuery from "./criteria"
+import { Rule } from "./criteria";
+import { MetaOptions } from "./metaOptions";
 
 export type Callback<T> = (err: Error | null, result: T) => void;
 
@@ -65,80 +67,6 @@ type CRUDBuilder<T> = WaterlinePromise<T> & {
 };
 
 
-type MetaOptions = {
-  /**
-   * When performing .update(), .create(), .createEach(), or .destroy() queries,
-   * set this to true to tell the database adapter to send back all records that
-   * were updated/destroyed. Otherwise, the second argument to the .exec() callback
-   * is undefined. Warning: Enabling this key may cause performance issues for
-   * update/destroy queries that affect large numbers of records.
-   */
-  fetch?: boolean;
-
-  /**
-   * If set to true on a .destroy(), this tells Waterline to perform a "virtual cascade"
-   * for every deleted record. Thus, deleting a record with a 2-way, plural association
-   * (one-to-many or many-to-many) will also cleanly remove all links to other records
-   * (by removing join table rows or setting foreign key values to null).
-   *
-   * This may be desirable if database size is a concern, or if primary keys may be
-   * reused for records, but it can negatively impact performance on .destroy() calls
-   * since it involves executing more queries.
-   *
-   * The cascade meta key should only be used with databases like MongoDB that don't
-   * support cascading delete as a native feature. If you need cascading delete and your
-   * database supports it natively (e.g. MySQL or PostgreSQL), you'll enjoy improved
-   * performance by simply adding a CASCADE constraint at the physical layer (e.g.
-   * phpMyAdmin, Sequel Pro, mySQL prompt, etc.), rather than relying on Waterline's
-   * virtual cascade to take effect at runtime.
-   */
-  cascade?: boolean;
-
-  /**
-   * Set to true to prevent lifecycle callbacks from running during the execution
-   * of the query.
-   */
-  skipAllLifecycleCallbacks?: boolean;
-
-  /**
-   * Set to true to skip Waterline's post-query verification pass of any records
-   * returned from the adapter(s). Useful for tools like sails-hook-orm's automigrations,
-   * or to disable warnings for use cases where you know that pre-existing records in
-   * the database do not match your model definitions.
-   */
-  skipRecordVerification?: boolean;
-
-  /**
-   * Set to true to force Waterline to skip expanding the select clause in criteria
-   * when it forges stage 3 queries (i.e., the queries that get passed into adapter methods).
-   * Normally, if a model declares schema: true, then the S3Q select clause is expanded
-   * to an array of column names, even if the S2Q had factory default select/omit clauses
-   * (which is also what it would have if no explicit select or omit clauses were included
-   * in the original query). Useful for tools like sails-hook-orm's automigrations, where
-   * you want temporary access to properties that aren't necessarily in the current set of
-   * attribute definitions. Warning: Do not use this flag in your web application backend,
-   * or at least ask for help first.
-   */
-  skipExpandingDefaultSelectClause?: boolean;
-
-  /**
-   * Set to true to decrypt any auto-encrypted data in the records.
-   */
-  decrypt?: boolean;
-
-  /**
-   * The id of a custom key to use for encryption for this particular query.
-   * (For decryption, the appropriate key is always used based on the data being decrypted.)
-   */
-  encryptWith?: string;
-
-  /**
-   * Set to true to make your query case-insensitive (only for use with the MongoDB adapter).
-   */
-  makeLikeModifierCaseInsensitive?: boolean;
-};
-
-
 //TODO: it found json fields more here types/experiments/extract.ts
 
 type IsInstanceOfModels<T, ProjectModels> = {
@@ -178,6 +106,7 @@ type ArrayOrInstanceModelPopulated<T> = T extends any[] ? { [K in keyof T[0]]: M
 type Filtered<T> = T extends never[] ? never : T;
 
 
+
 /**
 
 
@@ -210,7 +139,7 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<T>> & {
   populate<
     L = T extends object[] ? T[0] : T,
 
-    // почемуто все попадают в K
+    // TODO: for some reason everyone ends up in K, but only associations should
     K extends AssociationKeys<L>,
 
     FieldType extends L[K],
@@ -286,8 +215,8 @@ interface StreamBuilder<M> {
 
 type RequiredField<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
-
-export type Model<M> = Omit<M, "primaryKey" | "attributes"> & ORMModel<Pick<M, "primaryKey" | "attributes">>
+// TODO: add types for full mode by sails.models[X]
+export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes">>
 
 /**
  * 
@@ -475,9 +404,6 @@ export interface ORMModel<
   lease?(leaseCriteria: any): WaterlinePromise<Attr>;
 }
 
-
-
-
 export interface OneToOneAttribute {
   model: keyof Models;
 };
@@ -536,180 +462,6 @@ interface BaseAttribute {
 
 }
 
-
-type Rule =
-  | {
-    /**
-     * A value such that when it is provided as the first argument to the custom function, the function returns true.
-     * 
-     * Applicable Attribute Type(s): Any
-     */
-    custom: (value: any) => boolean
-  }
-  | {
-    /**
-     * A value that, when parsed as a date, refers to a moment after the configured JavaScript Date instance.
-     * 
-     * Applicable Attribute Type(s): String, Number
-     */
-    isAfter: Date
-  }
-  | {
-    /**
-     * A value that, when parsed as a date, refers to a moment before the configured JavaScript Date instance.
-     * 
-     * Applicable Attribute Type(s): String, Number
-     */
-    isBefore: Date
-  }
-  | {
-    /**
-     * A value that is true or false.
-     * 
-     * Applicable Attribute Type(s): JSON, Ref
-     */
-    isBoolean: boolean
-  }
-  | {
-    /**
-     * A value that is a credit card number.
-     * 
-     * Applicable Attribute Type(s): String
-     * 
-     * Notes: Do not store credit card numbers in your database unless your app is PCI compliant! If you want to allow users to store credit card information, a safe alternative is to use a payment API like Stripe.
-     */
-    isCreditCard: boolean
-  }
-  | {
-    /**
-     * A value that looks like an email address.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isEmail: boolean
-  }
-  | {
-    /**
-     * A string that is a hexadecimal color.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isHexColor: boolean
-  }
-  | {
-    /**
-     * A value that is in the specified array of allowed strings.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isIn: string[]
-  }
-  | {
-    /**
-     * A number that is an integer (a whole number).
-     * 
-     * Applicable Attribute Type(s): Number
-     */
-    isInteger: boolean
-  }
-  | {
-    /**
-     * A value that is a valid IP address (v4 or v6).
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isIP: boolean
-  }
-  | {
-    /**
-     * A value that is not an empty string.
-     * 
-     * Applicable Attribute Type(s): JSON, Ref
-     */
-    isNotEmptyString: boolean
-  }
-  | {
-    /**
-     * A value that is not in the configured array.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isNotIn: string[]
-  }
-  | {
-    /**
-     * A value that is a JavaScript number.
-     * 
-     * Applicable Attribute Type(s): JSON, Ref
-     */
-    isNumber: boolean
-  }
-  | {
-    /**
-     * A value that is a string.
-     * 
-     * Applicable Attribute Type(s): JSON, Ref
-     */
-    isString: boolean
-  }
-  | {
-    /**
-     * A value that looks like a URL.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isURL: boolean
-  }
-  | {
-    /**
-     * A value that looks like a UUID (v3, v4, or v5).
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    isUUID: boolean
-  }
-  | {
-    /**
-     * A number that is less than or equal to the configured number.
-     * 
-     * Applicable Attribute Type(s): Number
-     */
-    max: number
-  }
-  | {
-    /**
-     * A number that is greater than or equal to the configured number.
-     * 
-     * Applicable Attribute Type(s): Number
-     */
-    min: number
-  }
-  | {
-    /**
-     * A string that has no more than the configured number of characters.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    maxLength: number
-  }
-  | {
-    /**
-     * A string that has at least the configured number of characters.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    minLength: number
-  }
-  | {
-    /**
-     * A string that matches the configured regular expression.
-     * 
-     * Applicable Attribute Type(s): String
-     */
-    regex: RegExp
-  };
-
-
 export type CustomAttribute<T> = T
 
 type AttributeType = 'string' | 'number' | 'boolean' | 'json' | 'ref';
@@ -723,8 +475,7 @@ export type Attribute = SimpleAttribute
   | ManyToManyAttribute
   | Rule
 
-type ModelRelationType<T> = T extends keyof Models ? Models[T] | string : T;
-
+type ModelRelationType<T> = T extends keyof Models ? Models[T] | string | number : T;
 //type CollectionRelationType<T> = T extends keyof Models ? `${Models[T]}['primaryKey'] | string[] : T;
 type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string[] | number[] : T;
 

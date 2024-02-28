@@ -206,3 +206,175 @@ export type WhereCriteriaQuery<T> = {
   not<T[P][]> |
   or<T>
 };
+
+export type Rule =
+  | {
+    /**
+     * A value such that when it is provided as the first argument to the custom function, the function returns true.
+     * 
+     * Applicable Attribute Type(s): Any
+     */
+    custom: (value: any) => boolean
+  }
+  | {
+    /**
+     * A value that, when parsed as a date, refers to a moment after the configured JavaScript Date instance.
+     * 
+     * Applicable Attribute Type(s): String, Number
+     */
+    isAfter: Date
+  }
+  | {
+    /**
+     * A value that, when parsed as a date, refers to a moment before the configured JavaScript Date instance.
+     * 
+     * Applicable Attribute Type(s): String, Number
+     */
+    isBefore: Date
+  }
+  | {
+    /**
+     * A value that is true or false.
+     * 
+     * Applicable Attribute Type(s): JSON, Ref
+     */
+    isBoolean: boolean
+  }
+  | {
+    /**
+     * A value that is a credit card number.
+     * 
+     * Applicable Attribute Type(s): String
+     * 
+     * Notes: Do not store credit card numbers in your database unless your app is PCI compliant! If you want to allow users to store credit card information, a safe alternative is to use a payment API like Stripe.
+     */
+    isCreditCard: boolean
+  }
+  | {
+    /**
+     * A value that looks like an email address.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isEmail: boolean
+  }
+  | {
+    /**
+     * A string that is a hexadecimal color.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isHexColor: boolean
+  }
+  | {
+    /**
+     * A value that is in the specified array of allowed strings.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isIn: string[]
+  }
+  | {
+    /**
+     * A number that is an integer (a whole number).
+     * 
+     * Applicable Attribute Type(s): Number
+     */
+    isInteger: boolean
+  }
+  | {
+    /**
+     * A value that is a valid IP address (v4 or v6).
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isIP: boolean
+  }
+  | {
+    /**
+     * A value that is not an empty string.
+     * 
+     * Applicable Attribute Type(s): JSON, Ref
+     */
+    isNotEmptyString: boolean
+  }
+  | {
+    /**
+     * A value that is not in the configured array.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isNotIn: string[]
+  }
+  | {
+    /**
+     * A value that is a JavaScript number.
+     * 
+     * Applicable Attribute Type(s): JSON, Ref
+     */
+    isNumber: boolean
+  }
+  | {
+    /**
+     * A value that is a string.
+     * 
+     * Applicable Attribute Type(s): JSON, Ref
+     */
+    isString: boolean
+  }
+  | {
+    /**
+     * A value that looks like a URL.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isURL: boolean
+  }
+  | {
+    /**
+     * A value that looks like a UUID (v3, v4, or v5).
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    isUUID: boolean
+  }
+  | {
+    /**
+     * A number that is less than or equal to the configured number.
+     * 
+     * Applicable Attribute Type(s): Number
+     */
+    max: number
+  }
+  | {
+    /**
+     * A number that is greater than or equal to the configured number.
+     * 
+     * Applicable Attribute Type(s): Number
+     */
+    min: number
+  }
+  | {
+    /**
+     * A string that has no more than the configured number of characters.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    maxLength: number
+  }
+  | {
+    /**
+     * A string that has at least the configured number of characters.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    minLength: number
+  }
+  | {
+    /**
+     * A string that matches the configured regular expression.
+     * 
+     * Applicable Attribute Type(s): String
+     */
+    regex: RegExp
+  };

@@ -9,7 +9,7 @@ import slugify from "slugify"
  *  */ 
 
 // Define Attributes
-export default Category;
+export type CategoryInstance = Category;
 interface Category extends Partial<ModelOptions> {}
 type ModelOptions = ModelTypeDetection<typeof attributes>
 let a: Attributes;
@@ -56,11 +56,7 @@ const model = {
 
 module.exports = model;
 
-
 declare global {
-  /**
-   * Here passed "id" field  for requireid on create instance of model
-   */
   const Category: Model<typeof model>;
   interface Models {
     Category: Category;
