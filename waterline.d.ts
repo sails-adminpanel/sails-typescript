@@ -363,7 +363,7 @@ type NonPrimitive<T> = T extends object
 
 type NonPrimitiveArray<T> = T extends (infer U)[]
   ? U extends never ? never : NonPrimitive<U>[]
-  : never;
+  : `never3`;
 
 type OnlyBaseModelPrimitives<T> = T extends Primitives ? T : never;
 
@@ -412,13 +412,10 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<T>> & {
 
     FieldType extends L[K],
 
-    // Types for model and collectons detect
-    F = FieldType extends object[] ? M[0] : M,
+    PopulizedField = FieldType extends Array<any> ? Filtered<NonPrimitiveArray<FieldType>> : Filtered<NonPrimitive<FieldType>>,
 
-    PopulizedField = Filtered<NonPrimitiveArray<FieldType>>,
-
-    N = Omit<L, K> & { [P in K]: PopulizedField}
-  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? N[] : N>;
+    ResultType = Omit<L, K> & { [P in K]: PopulizedField }
+  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? ResultType[] : ResultType>;
 
   /**
    * @deprecated
@@ -913,7 +910,7 @@ export type Attribute = SimpleAttribute
 type ModelRelationType<T> = T extends keyof Models ? Models[T] | string : T;
 
 //type CollectionRelationType<T> = T extends keyof Models ? `${Models[T]}['primaryKey'] | string[] : T;
- type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string[] | number[] : T;
+type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string[] | number[] : T;
 
 type AssignCustomType<K> = K extends keyof AppCustomJsonTypes ? AppCustomJsonTypes[K] : DefaultJsonType[] | DefaultJsonType;
 

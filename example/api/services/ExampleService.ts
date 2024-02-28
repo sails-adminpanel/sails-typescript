@@ -13,9 +13,9 @@ let service = {
     let b0 = await Category.find( {id: "123"})
     let b1 = await Category.find("test")
     // !TODO: over load work not correctly
-    let w1 = await Article.findOne({id: "123"})//.populate("category");
+    let w1 = await Article.findOne({id: "123"}).populate("category");
     let c = await Category.findOne({"id": "test"}).populate("articles")
-    let c4 = await Category.findOne({"id": "test"}).populate("articles", "test")
+    let c4 = await Category.findOne({"id": "test"}).populate("articles")
 
     let w =  (await Article.find({id: "123"})).shift();
     
