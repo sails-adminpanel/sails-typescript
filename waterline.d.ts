@@ -54,8 +54,8 @@ type WaterlinePromise<T> = BluebirdPromise<T> & {
    * This is an alternative to .exec(). When combined with .catch(), it provides the same functionality.
    * For more information, see the bluebird .then() api docs.
   */
-  then(cb: Callback<T>): QueryBuilder<T>;
-  catch(cb: (err: Error) => void): QueryBuilder<T>;
+  then(cb: Callback<T>): QueryBuilder<T, undefined>;
+  catch(cb: (err: Error) => void): QueryBuilder<T, undefined>;
 
 };
 
@@ -125,13 +125,10 @@ type ModelOrPrimitiveFlat<F> = DistributivePrimitive<F> extends never
 
 type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true;
 
-type OmitCollection<T> = {
-  [F in keyof T]: 
-    T[F] extends Primitives ? T[F] :
-      T[F] extends DefaultJsonType ? T[F] : 
-        T[F] extends AppCustomJsonTypes[] ? T[F]: "OmitCollection has filtred populate "
+type OmitUnpopulatedCollection<T, E> = {
+  [F in keyof T]: T[F] extends any[] ? 
+    F extends E ?  T[F] : undefined : T[F]
 }
-
 
 
 
@@ -151,15 +148,15 @@ type OmitCollection<T> = {
 /**
  * Options for executing queries in Waterline.
  */
-type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitCollection<T>>> & {
-  where(condition: any): QueryBuilder<T>;
-  limit(lim: number): QueryBuilder<T>;
-  skip(num: number): QueryBuilder<T>;
+type QueryBuilder<T, PopulatedFields> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitUnpopulatedCollection<T, PopulatedFields>>> & {
+  where(condition: any): QueryBuilder<T, PopulatedFields>;
+  limit(lim: number): QueryBuilder<T, PopulatedFields>;
+  skip(num: number): QueryBuilder<T, PopulatedFields>;
   // TODO: impl String _or_ Array of Dictionary
   //  sort(criteria: M<T>): QueryBuilder<T>;
   //  sort(criteria: M<T>[]): QueryBuilder<T>;
-  sort(sortClause: string): QueryBuilder<T>;
-  paginate(pagination?: { page: number; limit: number }): QueryBuilder<T>;
+  sort(sortClause: string): QueryBuilder<T, PopulatedFields>;
+  paginate(pagination?: { page: number; limit: number }): QueryBuilder<T, PopulatedFields>;
 
   // base population
   // populate<K extends AssociationKeys<T>, M extends T[K], N = Omit<T, K> & { [P in K]: PopulizedModel<NonPrimitive<M>> }>(association: K): QueryBuilder<N>;
@@ -175,18 +172,18 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitCollec
     PopulizedField = FieldType extends Array<any> ? Filtered<NonPrimitiveArray<FieldType>> : Filtered<NonPrimitive<FieldType>>,
 
     ResultType = Omit<L, K> & { [P in K]: PopulizedField }
-  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? ResultType[] : ResultType>;
+  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? ResultType[] : ResultType, PopulatedFields | K>;
 
   /**
    * @deprecated
    */
-  average(attribute: keyof T): QueryBuilder<T>;
+  average(attribute: keyof T): QueryBuilder<T, PopulatedFields>;
 
   /**
    * Provide additional options to Waterline when executing a query instance.
    * 
    */
-  meta(options: MetaOptions): QueryBuilder<T>;
+  meta(options: MetaOptions): QueryBuilder<T, PopulatedFields>;
 
   /**
    * Capture and intercept the specified error, automatically modifying and re-throwing it, or specifying a new error to be thrown instead. (Still throws.)
@@ -212,7 +209,7 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitCollec
    * 
    * 
    */
-  decrypt(): QueryBuilder<T>;
+  decrypt(): QueryBuilder<T, PopulatedFields>;
 
   /**
    * Tolerate (swallow) the specified error, and return a new result value (or undefined) instead. (Don't throw.)
@@ -224,12 +221,12 @@ type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitCollec
   /**
    * This is an alternative to .exec().
    */
-  toPromise(): QueryBuilder<T>;
+  toPromise(): QueryBuilder<T, PopulatedFields>;
 
   /**
    * Specify an existing database connection to use for this query.
    */
-  usingConnection(connection: any): QueryBuilder<T>;
+  usingConnection(connection: any): QueryBuilder<T, PopulatedFields>;
 };
 
 type RecordHandler<M> = (record: M) => Promise<M>;
@@ -295,38 +292,38 @@ export interface ORMModel<
   /**
    * Find records that match the specified criteria.
    */
-  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[]>;
-  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[]>;
-  find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[]>;
+  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
+  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
+  find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
 
   /**
    * Find a single record that matches the specified criteria.
    */
-  findOne?(primaryKey?: TypeOfPK): QueryBuilder<Attr>;
-  findOne?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr>;
-  findOne?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr>;
+  findOne?(primaryKey?: TypeOfPK): QueryBuilder<Attr, undefined>;
+  findOne?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr, undefined>;
+  findOne?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr, undefined>;
 
   /**
    * Finds a record matching the provided criteria, or creates one if no record was found.
    */
-  findOrCreate?(primaryKey?: TypeOfPK, values?: RequiredField<Attr>): QueryBuilder<Attr>;
-  findOrCreate?(criteria?: CriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr>;
-  findOrCreate?(where?: WhereCriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr>;
+  findOrCreate?(primaryKey?: TypeOfPK, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
+  findOrCreate?(criteria?: CriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
+  findOrCreate?(where?: WhereCriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
 
   /**
    * Updates records that match the specified criteria.
    * It applies the provided changes to all matching records.
    */
   update?(primaryKey: TypeOfPK, changes: Partial<Attr>): UpdateBuilder<Attr[]>;
-  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[]>;
-  update?(where: WhereCriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[]>;
+  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
+  update?(where: WhereCriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
 
   /**
    * Updates a single record that matches the specified criteria.
    */
-  updateOne?(criteria: CriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr>;
-  updateOne?(where: WhereCriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr>;
-  updateOne?(primaryKey: TypeOfPK, changes: Partial<Attr>): QueryBuilder<Attr>;
+  updateOne?(criteria: CriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
+  updateOne?(where: WhereCriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
+  updateOne?(primaryKey: TypeOfPK, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
 
   /**
    * Begins an update operation that can have additional changes applied before execution.

@@ -88,4 +88,3 @@ declare global {
     optionsArticleModel: OptionsArticleModel
   }
 }
-
