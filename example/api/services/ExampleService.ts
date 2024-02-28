@@ -11,7 +11,7 @@ let service = {
     let a = await Category.create({"name": "test"}).fetch()
     let b = await Category.find({"where": {id: "123"}})
     let b0 = await Category.find( {id: "123"})
-    let b1 = await Category.find("test")
+    let b1 = await Category.findOne("test")
     // !TODO: over load work not correctly
     let w1 = await Article.findOne({id: "123"}).populate("category");
     let c = await Category.findOne({"id": "test"}).populate("articles")
