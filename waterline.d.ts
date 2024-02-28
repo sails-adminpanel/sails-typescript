@@ -78,32 +78,60 @@ type AssociationKeys<T> = {
   [K in keyof T]: IsInstanceOfModels<T[K], Models> extends never ? never : K;
 }[keyof T];
 
+type Primitives = string | number | boolean;
+
+// Filters
+
 type NonPrimitive<T> = T extends object
   ? Exclude<T, string | number | boolean | symbol | null | undefined>
   : never;
 
 type NonPrimitiveArray<T> = T extends (infer U)[]
   ? U extends never ? never : NonPrimitive<U>[]
-  : `never3`;
+  : never;
 
-type OnlyBaseModelPrimitives<T> = T extends Primitives ? T : never;
+type PrimitiveArray<T> = T extends (infer U)[]
+  ? U extends Primitive ? U[] : never
+  : never;
 
-type UnionToIntersection<U> =
-  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
-
-type Primitives = string | number | boolean;
-
-type DistributivePrimitive<T> = T extends Primitives ? T : never;
-
-type DistributiveModel<T> = T extends Array<T> ? T[0] extends Models[keyof Models] ? T : never : T;
-
-type ModelOrPrimitive<T> = [DistributivePrimitive<T>] extends [never]
-  ? DistributiveModel<T>
-  : DistributivePrimitive<T>;
-
-type ArrayOrInstanceModelPopulated<T> = T extends any[] ? { [K in keyof T[0]]: ModelOrPrimitive<T[0][K]> }[] : { [K in keyof T]: ModelOrPrimitive<T[K]> };
+type PrimitiveType<T> = T extends Primitive ? T : never;
 
 type Filtered<T> = T extends never[] ? never : T;
+
+// With population
+type ArrayOrInstanceModelPopulated<T> = T extends any[] ? { [F in keyof T[0]]: ModelOrPrimitive<T[0][F]> }[] : { [F in keyof T]: ModelOrPrimitive<T[F]> };
+
+type DistributivePrimitive<F> = F extends Primitives ? F : never;
+
+type DistributiveModel<F> = F extends Array<F> ? F[0] extends Models[keyof Models] ? F : never : F;
+
+type ModelOrPrimitive<F> = DistributivePrimitive<F> extends never
+  ? DistributiveModel<F>
+  : DistributivePrimitive<F>;
+
+
+
+// Without population
+
+type ArrayOrInstanceModelUnPopulated<T> = T extends any[] ? { [F in keyof T[0]]: ModelOrPrimitiveFlat<T[0][F]> }[] : { [F in keyof T]: ModelOrPrimitiveFlat<T[F]> };
+
+type DistributiveModelFlat<F> = F extends Array<F> ?
+  F[0] extends Models[keyof Models] ?
+  F : never : F;
+
+type ModelOrPrimitiveFlat<F> = DistributivePrimitive<F> extends never
+  ? DistributiveModelFlat<F>
+  : DistributivePrimitive<F>;
+
+type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true;
+
+type OmitCollection<T> = {
+  [F in keyof T]: 
+    T[F] extends Primitives ? T[F] :
+      T[F] extends DefaultJsonType ? T[F] : 
+        T[F] extends AppCustomJsonTypes[] ? T[F]: "OmitCollection has filtred populate "
+}
+
 
 
 
@@ -123,7 +151,7 @@ type Filtered<T> = T extends never[] ? never : T;
 /**
  * Options for executing queries in Waterline.
  */
-type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<T>> & {
+type QueryBuilder<T> = WaterlinePromise<ArrayOrInstanceModelPopulated<OmitCollection<T>>> & {
   where(condition: any): QueryBuilder<T>;
   limit(lim: number): QueryBuilder<T>;
   skip(num: number): QueryBuilder<T>;
