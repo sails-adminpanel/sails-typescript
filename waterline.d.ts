@@ -298,63 +298,63 @@ export interface ORMModel<
   /**
    * Find a single record that matches the specified criteria.
    */
-  findOne?(primaryKey?: TypeOfPK): QueryBuilder<Attr, undefined>;
-  findOne?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr, undefined>;
   findOne?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr, undefined>;
+  findOne?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr, undefined>;
+  findOne?(primaryKey?: TypeOfPK): QueryBuilder<Attr, undefined>;
 
   /**
    * Finds a record matching the provided criteria, or creates one if no record was found.
    */
-  findOrCreate?(primaryKey?: TypeOfPK, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
-  findOrCreate?(criteria?: CriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
   findOrCreate?(where?: WhereCriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
+  findOrCreate?(criteria?: CriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
+  findOrCreate?(primaryKey?: TypeOfPK, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
 
   /**
    * Updates records that match the specified criteria.
    * It applies the provided changes to all matching records.
    */
-  update?(primaryKey: TypeOfPK, changes: Partial<Attr>): UpdateBuilder<Attr[]>;
-  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
   update?(where: WhereCriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
+  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
+  update?(primaryKey: TypeOfPK, changes: Partial<Attr>): UpdateBuilder<Attr[]>;
 
   /**
    * Updates a single record that matches the specified criteria.
    */
-  updateOne?(criteria: CriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
   updateOne?(where: WhereCriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
+  updateOne?(criteria: CriteriaQuery<Partial<Attr>>, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
   updateOne?(primaryKey: TypeOfPK, changes: Partial<Attr>): QueryBuilder<Attr, undefined>;
 
   /**
    * Begins an update operation that can have additional changes applied before execution.
    */
-  update?(primaryKey: TypeOfPK): UpdateBuilder<Attr>;
   update?(where: WhereCriteriaQuery<Attr>): UpdateBuilder<Attr>;
   update?(criteria: CriteriaQuery<Attr>): UpdateBuilder<Attr>;
+  update?(primaryKey: TypeOfPK): UpdateBuilder<Attr>;
 
 
-  updateOne?(criteria: CriteriaQuery<Attr>): UpdateBuilder<Attr>;
   updateOne?(where: WhereCriteriaQuery<Attr>): UpdateBuilder<Attr>;
+  updateOne?(criteria: CriteriaQuery<Attr>): UpdateBuilder<Attr>;
   updateOne?(primaryKey: TypeOfPK): UpdateBuilder<Attr>;
 
   /**
    * Deletes records that match the specified criteria.
    */
-  destroy?(criteria: CriteriaQuery<Attr>): CRUDBuilder<Attr[]>;
   destroy?(where: WhereCriteriaQuery<Attr>): CRUDBuilder<Attr[]>;
+  destroy?(criteria: CriteriaQuery<Attr>): CRUDBuilder<Attr[]>;
   destroy?(primaryKey: TypeOfPK): CRUDBuilder<Attr[]>;
 
   /**
    * Deletes a single record that matches the specified criteria.
    */
-  destroyOne?(criteria: CriteriaQuery<Attr>[]): CRUDBuilder<Attr[]>;
   destroyOne?(where: WhereCriteriaQuery<Attr>[]): CRUDBuilder<Attr[]>;
+  destroyOne?(criteria: CriteriaQuery<Attr>[]): CRUDBuilder<Attr[]>;
   destroyOne?(primaryKey: TypeOfPK): CRUDBuilder<Attr[]>;
 
   /**
    * Count the number of records that match the specified criteria.
    */
-  count?(criteria?: CriteriaQuery<Attr>): WaterlinePromise<number>;
   count?(where?: WhereCriteriaQuery<Attr>): WaterlinePromise<number>;
+  count?(criteria?: CriteriaQuery<Attr>): WaterlinePromise<number>;
   count?(primaryKey?: TypeOfPK): WaterlinePromise<number>;
 
   /**
@@ -371,8 +371,8 @@ export interface ORMModel<
   /**
    * Allows you to stream records from the database using Node.js streams.
    */
-  stream?(criteria: CriteriaQuery<Attr>): StreamBuilder<Attr>;
   stream?(where: WhereCriteriaQuery<Attr>): StreamBuilder<Attr>;
+  stream?(criteria: CriteriaQuery<Attr>): StreamBuilder<Attr>;
   stream?(primaryKey: TypeOfPK): StreamBuilder<Attr>;
 
   /**
