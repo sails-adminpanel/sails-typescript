@@ -13,7 +13,7 @@ type ModelOptions = ModelTypeDetection<typeof attributes>
 let a: Attributes;
 const attributes = a = {
   id: {
-    type: "string",
+    type: "number",
     unique: true
   },
   name: "string",

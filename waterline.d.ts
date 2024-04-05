@@ -1,6 +1,6 @@
 import { LifecycleCallbacks, AttributeValidations } from "waterline";
 import BluebirdPromise = require('bluebird');
-import WhereCriteriaQuery from "./criteria"
+import {CriteriaQuery, WhereCriteriaQuery} from "./criteria"
 import { Rule } from "./criteria";
 import { MetaOptions } from "./metaOptions";
 
@@ -241,7 +241,7 @@ interface StreamBuilder<M> {
 type RequiredField<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
 // TODO: add types for full mode by sails.models[X]
-export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes">>
+export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes" | "primaryKey">>
 
 /**
  * 
@@ -262,8 +262,7 @@ export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes">>
 export interface ORMModel<
   M,
   Attr = Partial<ModelTypeDetection<M['attributes']>> & ModelTimestamps,
-  PK = Attr[M['primaryKey'] extends never ? 'id' : M['primaryKey']],
-  TypeOfPK = Attr extends { [K in PK]: infer PKType } ? PKType : never,
+  TypeOfPK = Attr[M["primaryKey"]] extends string ? string : number ,  // `${Attr[PK]}` //Attr extends { [K in PK]: infer PKType } ? PKType : never,
   /**
    * List of required keys
    */
@@ -292,9 +291,9 @@ export interface ORMModel<
   /**
    * Find records that match the specified criteria.
    */
-  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
-  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
   find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
+  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
+  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
 
   /**
    * Find a single record that matches the specified criteria.

@@ -16,7 +16,6 @@ let a: Attributes;
 const attributes = a = {
   id: {
     type: "string",
-    unique: true
   },
   name: "string",
   slug: {

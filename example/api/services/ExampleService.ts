@@ -14,10 +14,10 @@ let service = {
     let b1 = await Category.findOne("test")
     b1.id
     // !TODO: over load work not correctly
-    let w1 = await Article.findOne({id: "123"}).populate("links").populate("category");
+    let w1 = await Article.findOne({id: 123})//.populate("links")//.populate("category");
     let c = await Category.findOne({"id": "test"}).populate("articles")
     let c4 = await Category.findOne({"id": "test"}).populate("articles")
-    let w =  (await Article.find({id: "123"})).shift();
+    let w =  (await Article.find(124)).shift();
     
     // w This is custom type (AppCustomJsonTypes)
     w.optionsArticleModel
