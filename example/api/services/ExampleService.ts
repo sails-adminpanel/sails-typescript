@@ -14,7 +14,7 @@ let service = {
     let b1 = await Category.findOne("test")
     b1.id
     // !TODO: over load work not correctly
-    let w1 = await Article.findOne({id: 123})//.populate("links")//.populate("category");
+    let w1 = await Article.findOne({customId: 123})//.populate("links")//.populate("category");
     let c = await Category.findOne({"id": "test"}).populate("articles")
     let c4 = await Category.findOne({"id": "test"}).populate("articles")
     let w =  (await Article.find(124)).shift();
@@ -24,7 +24,7 @@ let service = {
     
 
     // !TODO: links should  accept only number array
-    await Article.create({price: 123, requiredOption: true, links: [123,345]}).fetch() 
+    let bbbo = await Article.create({price: 123, requiredOption: true, links: ["123","345"]}).fetch() 
 
   //  await Article.update("123", { category: [123,345]}).fetch() 
     

@@ -48,7 +48,7 @@ const methods = {
 
 
 const model = {
-  primaryKey: "id" as const,
+  primaryKey: "id",
   attributes: attributes,
   ...methods,
 };

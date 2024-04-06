@@ -1,6 +1,6 @@
 import { LifecycleCallbacks, AttributeValidations } from "waterline";
 import BluebirdPromise = require('bluebird');
-import {CriteriaQuery, WhereCriteriaQuery} from "./criteria"
+import { CriteriaQuery, WhereCriteriaQuery } from "./criteria"
 import { Rule } from "./criteria";
 import { MetaOptions } from "./metaOptions";
 
@@ -13,7 +13,22 @@ declare global {
    */
   interface Models { }
 
+  /**
+   * To assign the optionsArticleModel field to the desired type, you must complete the global interface
+   * ⚠️ For different models with the same `'json'` property, there must be one type. 
+   * In the current version, I haven't found a more elegant way to solve this.
+   *  
+   * If you have an idea please contact us, or make a github issue / PR in this repo
+   */
   interface AppCustomJsonTypes { }
+
+
+  /**
+   * ⚠️ If you set custom id fields you should resolve it in global interface CustomPKs
+   * This is due to the fact that most of the models work on id, and to simplify typing we do not display them
+   * Although it is entirely possible to change the structure to the Models[M][primaryKey] volume to remove this global interface
+   */
+  interface CustomPKs { }
 }
 
 
@@ -126,8 +141,8 @@ type ModelOrPrimitiveFlat<F> = DistributivePrimitive<F> extends never
 type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true;
 
 type OmitUnpopulatedCollection<T, E> = {
-  [F in keyof T]: T[F] extends any[] ? 
-    F extends E ?  T[F] : undefined : T[F]
+  [F in keyof T]: T[F] extends any[] ?
+  F extends E ? T[F] : undefined : T[F]
 }
 
 
@@ -241,7 +256,7 @@ interface StreamBuilder<M> {
 type RequiredField<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
 // TODO: add types for full mode by sails.models[X]
-export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes" | "primaryKey">>
+export type Model<M> = Omit<M, "attributes" | "primaryKey"> & ORMModel<Pick<M, "attributes" | "primaryKey">>
 
 /**
  * 
@@ -262,7 +277,7 @@ export type Model<M> = Omit<M, "attributes"> & ORMModel<Pick<M, "attributes" | "
 export interface ORMModel<
   M,
   Attr = Partial<ModelTypeDetection<M['attributes']>> & ModelTimestamps,
-  TypeOfPK = Attr[M["primaryKey"]] extends string ? string : number ,  // `${Attr[PK]}` //Attr extends { [K in PK]: infer PKType } ? PKType : never,
+  TypeOfPK = Attr[M["primaryKey"]] extends string ? string : number,  // `${Attr[PK]}` //Attr extends { [K in PK]: infer PKType } ? PKType : never,
   /**
    * List of required keys
    */
@@ -499,9 +514,12 @@ export type Attribute = SimpleAttribute
   | ManyToManyAttribute
   | Rule
 
-type ModelRelationType<T> = T extends keyof Models ? Models[T] | string | number : T;
-//type CollectionRelationType<T> = T extends keyof Models ? `${Models[T]}['primaryKey'] | string[] : T;
-type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | string[] | number[] : T;
+type PKTypeFor<T> = T extends keyof CustomPKs ? 
+  Models[T][CustomPKs[T]] extends string ? string : number : 
+  Models[T]['id'] extends string ? string : number
+
+type ModelRelationType<T> = T extends keyof Models ? Models[T] | PKTypeFor<T> : never;
+type CollectionRelationType<T> = T extends keyof Models ? Models[T][] | PKTypeFor<T>[] : never;
 
 type AssignCustomType<K> = K extends keyof AppCustomJsonTypes ? AppCustomJsonTypes[K] : DefaultJsonType[] | DefaultJsonType;
 
@@ -536,10 +554,10 @@ type AttributeTypeDetection<T, F> =
     : never)
 
   // Model relation
-  : T extends { model: string } ? T['model'] extends `${keyof Models}` ? ModelRelationType<T['model']> : never
+  : T extends { model: string } ? T['model'] extends keyof Models ? ModelRelationType<T['model']> : never
 
   // Collection relation
-  : T extends { collection: string } ? T['collection'] extends `${keyof Models}` ? CollectionRelationType<T['collection']> : never :
+  : T extends { collection: string } ? T['collection'] extends keyof Models ? CollectionRelationType<T['collection']> : never :
 
   T extends AttributeType ?
   (T extends 'string' ? string

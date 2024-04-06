@@ -7,14 +7,14 @@ export interface OptionsArticleModel {
   second: string
 }
 
-export type ArticleInstance = Article;
-interface Article extends Partial<ModelOptions> { }
+//export type ArticleInstance = Article;
+export interface IArticle extends Partial<ModelOptions> { }
 type ModelOptions = ModelTypeDetection<typeof attributes>
 let a: Attributes;
 const attributes = a = {
-  id: {
+  customId: {
     type: "number",
-    unique: true
+    autoIncrement:true
   },
   name: "string",
   requiredOption: {
@@ -40,16 +40,12 @@ const attributes = a = {
     collection: "Category",
     via: "articles"
   }
-};
+} as const;
 
 
 // Article model
 const methods = {
-  beforeCreate(record: Article, cb: (err?: Error | string) => void) {
-    if (!record.id) {
-      record.id = uuid();
-    }
-    
+  beforeCreate(record: IArticle, cb: (err?: Error | string) => void) {
     if (!record.slug) {
       record.slug = slugify(`${record.name}`, { remove: /[*+~.()'"!:@\\\/]/g, lower: true, strict: true, locale: 'en' })
     }
@@ -59,7 +55,7 @@ const methods = {
 
 
 const model = {
-  primaryKey: "id",
+  primaryKey: "customId",
   attributes: attributes,
   ...methods,
 };
@@ -73,7 +69,18 @@ declare global {
    */
   const Article: Model<typeof model>;
   interface Models {
-    Article: Article;
+    Article: IArticle;
+  }
+
+
+
+  /**
+   * ⚠️ If you set custom id fields you should resolve it in global interface CustomPKs
+   * This is due to the fact that most of the models work on id, and to simplify typing we do not display them
+   * Although it is entirely possible to change the structure to the Models[M][primaryKey] volume to remove this global interface
+   */
+  interface CustomPKs {
+    Article: 'customId';
   }
 
   /**
