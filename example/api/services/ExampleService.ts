@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ArticleInstance } from "../models/Article";
+import { IArticle } from "../models/Article";
 
 
 
 let service = {
 
-  async exec(domain: string, name: string): Promise<ArticleInstance> {
+  async exec(domain: string, name: string): Promise<IArticle> {
     let example;
 
     let a = await Category.create({"name": "test"}).fetch()
