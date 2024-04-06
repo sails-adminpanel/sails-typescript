@@ -11,7 +11,7 @@ let service = {
     let a = await Category.create({"name": "test"}).fetch()
     let b = await Category.find({"where": {id: "123"}})
     let b0 = await Category.find( {id: "123"})
-    let b1 = await Category.findOne("test")
+    let b1 = await Category.findOne(123)
     b1.id
     // !TODO: over load work not correctly
     let w1 = await Article.findOne({customId: 123})//.populate("links")//.populate("category");
@@ -26,7 +26,7 @@ let service = {
     // !TODO: links should  accept only number array
     let bbbo = await Article.create({price: 123, requiredOption: true, links: ["123","345"]}).fetch() 
 
-  //  await Article.update("123", { category: [123,345]}).fetch() 
+    await Article.update(123, { category: "123"}).fetch() 
     
     try {
 
