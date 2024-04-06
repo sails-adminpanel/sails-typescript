@@ -74,10 +74,43 @@ type WaterlinePromise<T> = BluebirdPromise<T> & {
 
 };
 
-type CRUDBuilder<T> = WaterlinePromise<T> & {
+type CRUDBuilder<T> = WaterlinePromise<undefined> & {
   /**
    * Tell Waterline (and the underlying database adapter) to send back records that were updated/destroyed/created when performing an .update(), .create(), .createEach() or .destroy() query. Otherwise, no data will be returned (or if you are using callbacks, the second argument to the .exec() callback will be undefined).
    */
+
+   /**
+   *  TODO: add from runtime
+   *  for create:
+   *    'meta',
+        'usingConnection',
+        'set',
+      for update:
+        'meta',
+        'usingConnection',
+        'where',
+        'set',
+        'fetch',
+        'decrypt',
+      for delete: 
+        'meta',
+        'usingConnection',
+        'where',
+        'fetch',
+        'decrypt',
+      for find:
+        'meta',         'usingConnection',
+        'where',        'limit',
+        'skip',         'paginate',
+        'sort',         'sum',
+        'avg',          'min',
+        'max',          'groupBy',
+        'select',       'omit',
+        'populateAll',  'populate',
+        'decrypt'
+   */
+
+
   fetch(): CRUDBuilder<T>;
 };
 
@@ -307,8 +340,8 @@ export interface ORMModel<
    * Find records that match the specified criteria.
    */
   find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
-  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
   find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
+  find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
 
   /**
    * Find a single record that matches the specified criteria.
