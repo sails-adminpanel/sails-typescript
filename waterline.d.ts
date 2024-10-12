@@ -55,8 +55,8 @@ type collectionMember = {
   members(childIds: string[]): Promise<void>;
 };
 
-type UpdateBuilder<T> = CRUDBuilder<T> & {
-  set: (changes: Partial<T>) => CRUDBuilder<T> & WaterlinePromise<T[]>
+type UpdateBuilder<T> = FetchOrUndefined<T> & {
+  set: (changes: Partial<T>) => FetchOrUndefined<T>
 }
 
 
@@ -74,7 +74,7 @@ type WaterlinePromise<T> = BluebirdPromise<T> & {
 
 };
 
-type CRUDBuilder<T> = WaterlinePromise<undefined> & {
+type FetchOrUndefined<T> = WaterlinePromise<undefined> & {
   /**
    * Tell Waterline (and the underlying database adapter) to send back records that were updated/destroyed/created when performing an .update(), .create(), .createEach() or .destroy() query. Otherwise, no data will be returned (or if you are using callbacks, the second argument to the .exec() callback will be undefined).
    */
@@ -111,7 +111,7 @@ type CRUDBuilder<T> = WaterlinePromise<undefined> & {
    */
 
 
-  fetch(): CRUDBuilder<T>;
+  fetch(): BluebirdPromise<T>;
 };
 
 
@@ -161,13 +161,17 @@ type ModelOrPrimitive<F> = DistributivePrimitive<F> extends never
 
 // Without population
 
-type ArrayOrInstanceModelUnPopulated<T> = T extends any[] ? { [F in keyof T[0]]: ModelOrPrimitiveFlat<T[0][F]> }[] : { [F in keyof T]: ModelOrPrimitiveFlat<T[F]> };
+type ArrayOrInstanceModelUnPopulated<T> = T extends any[] ? 
+// for array  
+{ [F in keyof T[0]]: FieldUnpopulate<T[0][F]> }[] : 
+// for single
+{ [F in keyof T]: FieldUnpopulate<T[F]> };
 
 type DistributiveModelFlat<F> = F extends Array<F> ?
   F[0] extends Models[keyof Models] ?
   F : never : F;
 
-type ModelOrPrimitiveFlat<F> = DistributivePrimitive<F> extends never
+type FieldUnpopulate<F> = DistributivePrimitive<F> extends never
   ? DistributiveModelFlat<F>
   : DistributivePrimitive<F>;
 
@@ -220,7 +224,7 @@ type QueryBuilder<T, PopulatedFields> = WaterlinePromise<ArrayOrInstanceModelPop
     PopulizedField = FieldType extends Array<any> ? Filtered<NonPrimitiveArray<FieldType>> : Filtered<NonPrimitive<FieldType>>,
 
     ResultType = Omit<L, K> & { [P in K]: PopulizedField }
-  >(association: K, filter?: "todo"): QueryBuilder<T extends object[] ? ResultType[] : ResultType, PopulatedFields | K>;
+  >(association: K, filter?: {sort: string}): QueryBuilder<T extends object[] ? ResultType[] : ResultType, PopulatedFields | K>;
 
   /**
    * @deprecated
@@ -317,31 +321,14 @@ export interface ORMModel<
   C = RequiredKeys<M['attributes']>
 > {
 
-  /**
-   * Create a new record in the database. 
-   * This is used to insert a new record into a database table or collection.
-   */
-  create?(params: RequiredField<Attr, C>): CRUDBuilder<ArrayOrInstanceModelPopulated<Attr>>
-
-  /**
-   * Create multiple new records in the database at once. 
-   * This is used to insert multiple records into a database table or collection in a single operation.
-   */
-  create?(params: RequiredField<Attr[], C>): CRUDBuilder<ArrayOrInstanceModelPopulated<Attr>>;
-
-
-  /**
-   * Create each of the new records in the database. 
-   * This is used to insert each record into a database table or collection.
-   */
-  createEach?(params: RequiredField<M[], C>): CRUDBuilder<ArrayOrInstanceModelPopulated<Attr[]>>;
+  // **************** FIND
 
   /**
    * Find records that match the specified criteria.
    */
   find?(where?: WhereCriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
-  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
   find?(criteria?: CriteriaQuery<Attr>): QueryBuilder<Attr[], undefined>;
+  find?(primaryKey?: TypeOfPK): QueryBuilder<Attr[], undefined>;
 
   /**
    * Find a single record that matches the specified criteria.
@@ -357,13 +344,36 @@ export interface ORMModel<
   findOrCreate?(criteria?: CriteriaQuery<Attr>, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
   findOrCreate?(primaryKey?: TypeOfPK, values?: RequiredField<Attr>): QueryBuilder<Attr, undefined>;
 
+  // **************** CREATE
+
+  /**
+   * Create a new record in the database. 
+   * This is used to insert a new record into a database table or collection.
+   */
+  create?(params: RequiredField<Attr, C>): FetchOrUndefined<ArrayOrInstanceModelUnPopulated<Attr>>
+
+  /**
+   * Create multiple new records in the database at once. 
+   * This is used to insert multiple records into a database table or collection in a single operation.
+   */
+  create?(params: RequiredField<Attr[], C>): FetchOrUndefined<ArrayOrInstanceModelUnPopulated<Attr>>;
+
+
+  /**
+   * Create each of the new records in the database. 
+   * This is used to insert each record into a database table or collection.
+   */
+  createEach?(params: RequiredField<M[], C>): FetchOrUndefined<ArrayOrInstanceModelUnPopulated<Attr[]>>;
+
+  // **************** UPDATE
+
   /**
    * Updates records that match the specified criteria.
    * It applies the provided changes to all matching records.
    */
-  update?(where: WhereCriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
-  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): QueryBuilder<Attr[], undefined>;
-  update?(primaryKey: TypeOfPK, changes: Partial<Attr>): UpdateBuilder<Attr[]>;
+  update?(where: WhereCriteriaQuery<Attr>, changes: Partial<Attr>): UpdateBuilder<ArrayOrInstanceModelPopulated<Attr[]>>;
+  update?(criteria: CriteriaQuery<Attr>, changes: Partial<Attr>): UpdateBuilder<ArrayOrInstanceModelPopulated<Attr[]>>;
+  update?(primaryKey: TypeOfPK, changes: Partial<Attr>): UpdateBuilder<ArrayOrInstanceModelPopulated<Attr[]>>;
 
   /**
    * Updates a single record that matches the specified criteria.
@@ -384,19 +394,23 @@ export interface ORMModel<
   updateOne?(criteria: CriteriaQuery<Attr>): UpdateBuilder<Attr>;
   updateOne?(primaryKey: TypeOfPK): UpdateBuilder<Attr>;
 
+  // **************** DESTROY
+
   /**
    * Deletes records that match the specified criteria.
    */
-  destroy?(where: WhereCriteriaQuery<Attr>): CRUDBuilder<Attr[]>;
-  destroy?(criteria: CriteriaQuery<Attr>): CRUDBuilder<Attr[]>;
-  destroy?(primaryKey: TypeOfPK): CRUDBuilder<Attr[]>;
+  destroy?(where: WhereCriteriaQuery<Attr>): FetchOrUndefined<Attr[]>;
+  destroy?(criteria: CriteriaQuery<Attr>): FetchOrUndefined<Attr[]>;
+  destroy?(primaryKey: TypeOfPK): FetchOrUndefined<Attr[]>;
 
   /**
    * Deletes a single record that matches the specified criteria.
    */
-  destroyOne?(where: WhereCriteriaQuery<Attr>[]): CRUDBuilder<Attr[]>;
-  destroyOne?(criteria: CriteriaQuery<Attr>[]): CRUDBuilder<Attr[]>;
-  destroyOne?(primaryKey: TypeOfPK): CRUDBuilder<Attr[]>;
+  destroyOne?(where: WhereCriteriaQuery<Attr>[]): FetchOrUndefined<Attr[]>;
+  destroyOne?(criteria: CriteriaQuery<Attr>[]): FetchOrUndefined<Attr[]>;
+  destroyOne?(primaryKey: TypeOfPK): FetchOrUndefined<Attr[]>;
+
+  // **************** 
 
   /**
    * Count the number of records that match the specified criteria.
